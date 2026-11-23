@@ -31,4 +31,5 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $version = '${{ github.ref_name }}'.TrimStart('v')
-          gh release create '${{ github.ref_name }}' "artifacts/installer/Qorra-Setup-$version.exe" --title "Qorra $version" --generate-notes --verify-tag
+          Copy-Item "artifacts/installer/Qorra-Setup-$version.exe" artifacts/installer/Qorra-Setup.exe
+          gh release create '${{ github.ref_name }}' "artifacts/installer/Qorra-Setup-$version.exe" artifacts/installer/Qorra-Setup.exe --title "Qorra $version" --generate-notes --verify-tag

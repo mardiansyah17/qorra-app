@@ -51,4 +51,4 @@ A few things I care about:
 
 `build.ps1` builds the same installer locally (needs Inno Setup 6) into `artifacts/installer`.
 
-The app looks for a newer release on startup and links to its notes, so keep the installer name as is.
+The app looks for `Qorra-Setup-*.exe` in the latest release, and the website links to `releases/latest/download/Qorra-Setup.exe`. The workflow uploads both.

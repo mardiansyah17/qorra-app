@@ -17,7 +17,11 @@ MariaDB should work through the MySQL driver but I haven't tested it much.
 
 ## Install
 
-Grab the installer from [Releases](../../releases). Windows 10 1809+ x64.
+Download it from [qorra.mardiansyah.tech](https://qorra.mardiansyah.tech) or [Releases](../../releases). Windows 10 1809+ x64,
+no admin rights needed.
+
+The installer isn't code-signed yet, so SmartScreen may say "Windows protected your PC". Click **More info**, then
+**Run anyway**. Qorra updates itself after that.
 
 ## Build
 
