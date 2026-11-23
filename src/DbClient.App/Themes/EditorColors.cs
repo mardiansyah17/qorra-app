@@ -75,7 +75,7 @@ public static class EditorColors
         if (_editorResources) return;
         _editorResources = true;
         Application.Current.Resources.MergedDictionaries.Add(
-            new ResourceDictionary { Source = new Uri("/DbClient.App;component/Themes/Editor.xaml", UriKind.Relative) });
+            new ResourceDictionary { Source = new Uri("/Themes/Editor.xaml", UriKind.Relative) });
     }
 
     private static readonly HighlightingColor NumberColor = new();

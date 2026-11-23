@@ -3,12 +3,12 @@
                     xmlns:t="clr-namespace:DbClient.App.Themes">
     <ResourceDictionary.MergedDictionaries>
         <t:ThemeResources />
-        <ResourceDictionary Source="/DbClient.App;component/Themes/Tokens.xaml" />
-        <ResourceDictionary Source="/DbClient.App;component/Themes/Buttons.xaml" />
-        <ResourceDictionary Source="/DbClient.App;component/Themes/Inputs.xaml" />
-        <ResourceDictionary Source="/DbClient.App;component/Themes/Lists.xaml" />
-        <ResourceDictionary Source="/DbClient.App;component/Themes/Menus.xaml" />
-        <ResourceDictionary Source="/DbClient.App;component/Themes/Misc.xaml" />
-        <ResourceDictionary Source="/DbClient.App;component/Themes/DataGrid.xaml" />
+        <ResourceDictionary Source="/Themes/Tokens.xaml" />
+        <ResourceDictionary Source="/Themes/Buttons.xaml" />
+        <ResourceDictionary Source="/Themes/Inputs.xaml" />
+        <ResourceDictionary Source="/Themes/Lists.xaml" />
+        <ResourceDictionary Source="/Themes/Menus.xaml" />
+        <ResourceDictionary Source="/Themes/Misc.xaml" />
+        <ResourceDictionary Source="/Themes/DataGrid.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
