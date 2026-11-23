@@ -86,6 +86,7 @@ public partial class App : Application
         void Launch()
         {
             var main = OpenWindow(null);
+            if (settings.CheckForUpdates) _ = CheckForUpdatesAsync();
             var ids = settings.LaunchOpen switch
             {
                 "LastSession" => settings.LastSession.ToList(),
@@ -101,6 +102,18 @@ public partial class App : Application
                 _ = main.ConnectCommand.ExecuteAsync(profiles[0]);
             }
             foreach (var p in rest) OpenWindow(p.Id);
+        }
+
+        async Task CheckForUpdatesAsync()
+        {
+            await Task.Delay(TimeSpan.FromSeconds(10));
+            if (await Updater.CheckAsync(CancellationToken.None) is not ({ } release, _)) return;
+            if (OpenViewModels().FirstOrDefault() is not { } vm) return;
+            vm.Notify($"Qorra {release.Version} is available", null, ToastKind.Info, "Update", async () =>
+            {
+                vm.Notify($"Downloading Qorra {release.Version}…");
+                if (await Updater.InstallAsync(release, CancellationToken.None) is { } error) vm.Notify("Couldn't update", error, ToastKind.Error);
+            });
         }
 
         void RememberSession()

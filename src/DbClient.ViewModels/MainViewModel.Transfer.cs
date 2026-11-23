@@ -55,6 +55,27 @@ public sealed partial class MainViewModel
         }
     }
 
+    [RelayCommand]
+    private async Task ImportAsync()
+    {
+        if (await ImportConnectionsAsync() is { } message) Notify(message);
+    }
+
+    public bool ReopenLastSession
+    {
+        get => _settings.LaunchOpen == "LastSession";
+        set
+        {
+            _settings.LaunchOpen = value ? "LastSession" : "Connections";
+            try { _settingsStore.Save(_settings); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                Notify("Couldn't save settings", ex.Message, ToastKind.Error);
+            }
+            OnPropertyChanged();
+        }
+    }
+
     private async Task<string?> ImportConnectionsAsync()
     {
         if (PickOpenFile?.Invoke("Import connections", ConnectionFilter) is not { } path) return null;

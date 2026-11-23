@@ -1058,25 +1058,32 @@
 
                         <TextBlock Text="UPDATES" Style="{StaticResource Group}" />
                         <Border Style="{StaticResource Card}">
-                            <DockPanel Style="{StaticResource Row}">
-                                <Button DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,0,10,0" MinWidth="96" Content="Check now" Style="{DynamicResource Button.Primary}" />
-                                <TextBlock Text="Up to date" />
-                            </DockPanel>
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <Button DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,0,10,0" MinWidth="96" Content="{Binding UpdateButtonText}"
+                                            Style="{DynamicResource Button.Primary}" Command="{Binding UpdateCommand}" />
+                                    <TextBlock Text="{Binding UpdateStatus}" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.CheckForUpdates}" AutomationProperties.Name="Check for updates on startup" />
+                                    <TextBlock Text="Check for updates on startup" />
+                                </DockPanel>
+                            </StackPanel>
                         </Border>
 
                         <TextBlock Text="LINKS" Style="{StaticResource Group}" />
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
                                 <DockPanel Style="{StaticResource Row}">
-                                    <TextBlock DockPanel.Dock="Right" Text="&#xE0B9;" Style="{DynamicResource Text.Icon}" FontSize="13" Margin="0,0,14,0" Foreground="{DynamicResource Brush.Text.Tertiary}" />
+                                    <Button Content="Open" Command="{Binding OpenLinkCommand}" CommandParameter="{x:Static vm:SettingsViewModel.ReleasesUrl}" AutomationProperties.Name="Release notes" />
                                     <TextBlock Text="Release notes" />
                                 </DockPanel>
                                 <DockPanel Style="{StaticResource Row}">
-                                    <TextBlock DockPanel.Dock="Right" Text="&#xE0B9;" Style="{DynamicResource Text.Icon}" FontSize="13" Margin="0,0,14,0" Foreground="{DynamicResource Brush.Text.Tertiary}" />
+                                    <Button Content="Open" Command="{Binding OpenLinkCommand}" CommandParameter="{x:Static vm:SettingsViewModel.IssuesUrl}" AutomationProperties.Name="Report a problem" />
                                     <TextBlock Text="Report a problem" />
                                 </DockPanel>
                                 <DockPanel Style="{StaticResource Row}">
-                                    <TextBlock DockPanel.Dock="Right" Text="&#xE0B9;" Style="{DynamicResource Text.Icon}" FontSize="13" Margin="0,0,14,0" Foreground="{DynamicResource Brush.Text.Tertiary}" />
+                                    <Button Content="Open" Command="{Binding OpenLinkCommand}" CommandParameter="{x:Static vm:SettingsViewModel.LicensesPath}" AutomationProperties.Name="Third-party licenses" />
                                     <TextBlock Text="Third-party licenses" />
                                 </DockPanel>
                             </StackPanel>

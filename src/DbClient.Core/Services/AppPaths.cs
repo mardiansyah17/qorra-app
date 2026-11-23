@@ -2,9 +2,26 @@ namespace DbClient.Core.Services;
 
 public static class AppPaths
 {
-    public static string DataDirectory { get; } = OperatingSystem.IsMacOS()
-        ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Application Support", "Qorra")
-        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DbClient");
+    public static string DataDirectory { get; } = ResolveDataDirectory();
+
+    private static string ResolveDataDirectory()
+    {
+        if (OperatingSystem.IsMacOS())
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Application Support", "Qorra");
+        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var dir = Path.Combine(appData, "Qorra");
+        var old = Path.Combine(appData, "DbClient");
+        if (Directory.Exists(dir) || !Directory.Exists(old)) return dir;
+        try
+        {
+            Directory.Move(old, dir);
+            return dir;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return old;
+        }
+    }
 
     private static readonly Mutex StoreMutex = new(false, @"Local\DbClient.Store");
 

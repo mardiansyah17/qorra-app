@@ -4,5 +4,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Version>0.1.0</Version>
+    <Company>Qorra</Company>
+    <Copyright>Copyright (c) 2026 mardiansyah</Copyright>
   </PropertyGroup>
 </Project>

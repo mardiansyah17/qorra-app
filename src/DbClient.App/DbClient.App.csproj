@@ -16,7 +16,8 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <Version>0.1.0</Version>
+    <AssemblyName>Qorra</AssemblyName>
+    <RootNamespace>DbClient.App</RootNamespace>
     <Product>Qorra</Product>
     <AssemblyTitle>Qorra</AssemblyTitle>
     <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
@@ -32,10 +33,12 @@
     <Resource Include="Assets\app.ico" />
     <Resource Include="Assets\logo.png" />
     <Resource Include="Assets\lucide.ttf" />
+    <None Include="..\..\THIRD-PARTY-NOTICES.txt" Link="THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <PropertyGroup>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <SelfContained>true</SelfContained>
     <PublishReadyToRun>true</PublishReadyToRun>
     <PublishTrimmed>true</PublishTrimmed>

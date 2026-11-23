@@ -21,4 +21,8 @@ public static class Platform
     public static Action<AppSettings> ApplySettings { get; set; } = _ => { };
 
     public static Action<string> OpenFolder { get; set; } = _ => { };
+
+    public static Action<string> OpenUrl { get; set; } = _ => { };
+
+    public static Func<string, bool> RunInstaller { get; set; } = _ => false;
 }

@@ -36,7 +36,19 @@ internal static class WindowsPlatform
             return c.A == 0xFF ? $"#{c.R:X2}{c.G:X2}{c.B:X2}" : $"#{c.A:X2}{c.R:X2}{c.G:X2}{c.B:X2}";
         };
         Platform.OpenFolder = path => Process.Start(new ProcessStartInfo("explorer.exe", $"\"{path}\"") { UseShellExecute = true });
+        Platform.OpenUrl = url => Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        Platform.RunInstaller = RunInstaller;
         Platform.ApplySettings = Apply;
+    }
+
+    private static bool RunInstaller(string path)
+    {
+        var windows = Application.Current.Windows.OfType<Views.MainWindow>().ToList();
+        if (windows.Any(w => w.DataContext is MainViewModel vm && vm.AllTabs.Any(t => t.HasChanges))) return false;
+        foreach (var w in windows) w.Close();
+        Process.Start(new ProcessStartInfo(path, "/SILENT /SUPPRESSMSGBOXES /NORESTART") { UseShellExecute = true });
+        Application.Current.Shutdown();
+        return true;
     }
 
     private static void Apply(AppSettings s)

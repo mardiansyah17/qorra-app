@@ -48,6 +48,7 @@ public sealed class AppSettings
     public bool ConfirmQuit { get; set; } = true;
     public string Autosave { get; set; } = "1s";
     public List<Guid> LastSession { get; set; } = [];
+    public bool CheckForUpdates { get; set; } = true;
 
     public string EditorFontFamily { get; set; } = "Cascadia Code";
     public string EditorFontWeight { get; set; } = "Normal";

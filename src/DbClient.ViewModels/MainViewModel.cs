@@ -146,9 +146,7 @@ public sealed partial class MainViewModel : ObservableObject
 
     public SheetViewModel? ModalSheet => EditorPage is null ? Sheet : null;
 
-    public static string Version { get; } = "v" + (typeof(MainViewModel).Assembly
-        .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
-        .OfType<System.Reflection.AssemblyInformationalVersionAttribute>().FirstOrDefault()?.InformationalVersion.Split('+')[0] ?? "0.0.0");
+    public static string Version { get; } = "v" + Updater.Current.ToString(3);
 
     public Func<string?>? PickSqliteFile { get; set; }
     public Func<string, string?>? PickSaveFile { get; set; }

@@ -66,7 +66,7 @@ public sealed partial class SettingsViewModel : SheetViewModel
     public static int[] PageSizes => AppSettings.PageSizes;
     public static string[] MonoFonts { get; } = ["Cascadia Code", "Cascadia Mono", "Consolas", "JetBrains Mono", "Fira Code", "Source Code Pro", "Courier New", "Lucida Console"];
     public static string[] GridFonts => [.. MonoFonts, "Segoe UI Variable Text", "Segoe UI", "Inter"];
-    public static string Version { get; } = typeof(SettingsViewModel).Assembly.GetName().Version?.ToString(3) ?? "";
+    public static string Version { get; } = Updater.Current.ToString(3);
     public static string DataDirectory => AppPaths.DataDirectory;
 
     private static string Duration(int seconds) => seconds switch
@@ -305,6 +305,36 @@ public sealed partial class SettingsViewModel : SheetViewModel
 
     [RelayCommand]
     private static void OpenDataFolder() => Platform.OpenFolder(AppPaths.DataDirectory);
+
+    public static string ReleasesUrl => Updates.ReleasesUrl;
+    public static string IssuesUrl => Updates.IssuesUrl;
+    public static string LicensesPath => Path.Combine(AppContext.BaseDirectory, "THIRD-PARTY-NOTICES.txt");
+
+    [RelayCommand]
+    private static void OpenLink(string url) => Platform.OpenUrl(url);
+
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(UpdateButtonText))]
+    public partial AppRelease? Available { get; set; } = Updater.Available;
+
+    [ObservableProperty]
+    public partial string UpdateStatus { get; set; } = Updater.Available is { } a ? $"Version {a.Version} is available" : "Not checked yet";
+
+    public string UpdateButtonText => Available is null ? "Check now" : "Update";
+
+    [RelayCommand]
+    private async Task UpdateAsync(CancellationToken ct)
+    {
+        if (Available is { } release)
+        {
+            UpdateStatus = $"Downloading {release.Version}…";
+            UpdateStatus = await Updater.InstallAsync(release, ct) ?? $"Version {release.Version} is available";
+            return;
+        }
+        UpdateStatus = "Checking…";
+        var (latest, error) = await Updater.CheckAsync(ct);
+        Available = latest;
+        UpdateStatus = error ?? (latest is null ? "Qorra is up to date" : $"Version {latest.Version} is available");
+    }
 
     public static void Apply(AppSettings s)
     {

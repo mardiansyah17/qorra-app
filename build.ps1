@@ -4,6 +4,7 @@ Set-Location $PSScriptRoot
 $iscc = "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe"
 if (-not (Test-Path $iscc)) { throw "Inno Setup 6 not found at $iscc" }
 
+Remove-Item artifacts/publish -Recurse -Force -ErrorAction SilentlyContinue
 dotnet publish src/DbClient.App -c Release -o artifacts/publish
 if ($LASTEXITCODE) { throw 'publish failed' }
 
