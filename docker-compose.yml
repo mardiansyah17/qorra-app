@@ -1,0 +1,53 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: dbclient
+      POSTGRES_PASSWORD: dbclient_pw
+      POSTGRES_DB: dbclient_test
+    ports:
+      - "127.0.0.1:55432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "dbclient", "-d", "dbclient_test"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: dbclient_root_pw
+      MYSQL_USER: dbclient
+      MYSQL_PASSWORD: dbclient_pw
+      MYSQL_DATABASE: dbclient_test
+    ports:
+      - "127.0.0.1:53306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-udbclient", "-pdbclient_pw"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+
+  ssh:
+    build:
+      dockerfile_inline: |
+        FROM alpine:3.20
+        RUN apk add --no-cache openssh && ssh-keygen -A && adduser -D dbclient && echo 'dbclient:dbclient_pw' | chpasswd          && sed -i -E 's/^#?AllowTcpForwarding.*/AllowTcpForwarding yes/; s/^#?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+        CMD ["/usr/sbin/sshd", "-D", "-e"]
+    ports:
+      - "127.0.0.1:52222:22"
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    profiles: ["mssql"]
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "DbClient_pw1!"
+    ports:
+      - "127.0.0.1:11433:1433"
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-C", "-S", "localhost", "-U", "sa", "-P", "DbClient_pw1!", "-Q", "SELECT 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s

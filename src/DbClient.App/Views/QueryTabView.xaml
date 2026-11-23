@@ -1,0 +1,208 @@
+﻿<UserControl x:Class="DbClient.App.Views.QueryTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:app="clr-namespace:DbClient.App"
+             xmlns:themes="clr-namespace:DbClient.App.Themes"
+             xmlns:views="clr-namespace:DbClient.App.Views"
+             xmlns:vm="clr-namespace:DbClient.ViewModels;assembly=DbClient.ViewModels"
+             xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:QueryTabViewModel}">
+    <UserControl.Resources>
+        <ControlTemplate x:Key="PanelTab" TargetType="Control">
+            <Grid Background="Transparent" Cursor="Hand">
+                <ContentPresenter Margin="10,0" VerticalAlignment="Center"
+                                  Content="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}"
+                                  ContentTemplate="{Binding ContentTemplate, RelativeSource={RelativeSource TemplatedParent}}" />
+                <Border x:Name="Line" Height="2" VerticalAlignment="Bottom" Margin="6,0" CornerRadius="1"
+                        Background="{DynamicResource Brush.Accent}" Opacity="0">
+                    <themes:Fade.Visible>
+                        <MultiBinding Converter="{x:Static themes:Fade.AnyTrue}" ConverterParameter="Selected">
+                            <Binding Path="Tag" RelativeSource="{RelativeSource TemplatedParent}" />
+                        </MultiBinding>
+                    </themes:Fade.Visible>
+                </Border>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+                </Trigger>
+                <Trigger Property="Tag" Value="Selected">
+                    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+        <Style x:Key="PanelTabBase" TargetType="Control">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Tertiary}" />
+            <Setter Property="FocusVisualStyle" Value="{DynamicResource Focus.Ring.Inset}" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Template" Value="{StaticResource PanelTab}" />
+        </Style>
+        <Style x:Key="ResultChip" TargetType="ListBoxItem" BasedOn="{StaticResource PanelTabBase}">
+            <Setter Property="ToolTip" Value="{Binding Sql}" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Tag" Value="Selected" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="OutputChip" TargetType="Button" BasedOn="{StaticResource PanelTabBase}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ShowLog}" Value="True">
+                    <Setter Property="Tag" Value="Selected" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="2*" MinHeight="60" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="3*" MinHeight="80" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Margin="12,8,12,6">
+            <StackPanel Orientation="Horizontal">
+                <Button Style="{DynamicResource Button.Primary}" Padding="12,4" Click="OnRun"
+                        ToolTip="Run (Ctrl+Enter)" AutomationProperties.Name="Run">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE13C;" Style="{DynamicResource Text.Icon}" FontSize="11" Margin="0,0,7,0"
+                                   Foreground="{DynamicResource Brush.Text.OnAccent}" />
+                        <TextBlock Text="Run" />
+                        <TextBlock Text="Ctrl ⏎" Margin="8,1,0,0" FontSize="11" FontFamily="{DynamicResource Font.Mono}" Opacity="0.8" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource Button.Ghost}" Padding="10,4" Margin="6,0,0,0" Click="OnRunAll" Content="Run all"
+                        ToolTip="Run all (Ctrl+Shift+Enter)" AutomationProperties.Name="Run all" />
+                <Button Style="{DynamicResource Button.Ghost}" Padding="10,4" Margin="6,0,0,0" Command="{Binding LoadMoreCancelCommand}" Content="Stop"
+                        ToolTip="Stop (Esc)" AutomationProperties.Name="Stop query" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" themes:Fade.OnShow="True"
+                        Visibility="{Binding InTransaction, Converter={x:Static app:Converters.BoolToVisibility}}">
+                <Border Padding="9,3" CornerRadius="10" VerticalAlignment="Center" Background="{DynamicResource Brush.Pending.Subtle}">
+                    <TextBlock Text="Transaction open" FontSize="12" Foreground="{DynamicResource Brush.Pending}" />
+                </Border>
+                <Button Style="{DynamicResource Button.Ghost}" Padding="10,4" Margin="8,0,0,0" Content="Rollback" Command="{Binding RollbackCommand}"
+                        ToolTip="Ctrl+Alt+Backspace" AutomationProperties.Name="Rollback" />
+                <Button Style="{DynamicResource Button.Primary}" Padding="12,4" Margin="6,0,0,0" Content="Commit" Command="{Binding CommitCommand}"
+                        ToolTip="Ctrl+Alt+Enter" AutomationProperties.Name="Commit" />
+            </StackPanel>
+        </DockPanel>
+
+        <avalon:TextEditor x:Name="Editor" Grid.Row="1" Padding="6,4,6,4"
+                           FontFamily="{DynamicResource Font.Editor}" FontSize="{DynamicResource Font.Size.Editor}"
+                           FontWeight="{DynamicResource Font.Weight.Editor}"
+                           Background="{DynamicResource Brush.Bg.Surface}" Foreground="{DynamicResource Brush.Text.Primary}"
+                           LineNumbersForeground="{DynamicResource Brush.Text.Tertiary}"
+                           HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                           PreviewKeyDown="OnEditorPreviewKeyDown"
+                           AutomationProperties.Name="SQL editor">
+            <avalon:TextEditor.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Run statement" InputGestureText="Ctrl+Enter" Click="OnRun" />
+                    <MenuItem Header="Run all" InputGestureText="Ctrl+Shift+Enter" Click="OnRunAll" />
+                    <Separator />
+                    <MenuItem Header="Format SQL" InputGestureText="Ctrl+Alt+L" Click="OnFormat" />
+                    <MenuItem Header="Toggle comment" InputGestureText="Ctrl+/" Click="OnToggleComment" />
+                    <Separator />
+                    <MenuItem Header="Cut" Command="ApplicationCommands.Cut" />
+                    <MenuItem Header="Copy" Command="ApplicationCommands.Copy" />
+                    <MenuItem Header="Paste" Command="ApplicationCommands.Paste" />
+                    <Separator />
+                    <MenuItem Header="Find…" InputGestureText="Ctrl+F" Command="ApplicationCommands.Find" />
+                </ContextMenu>
+            </avalon:TextEditor.ContextMenu>
+        </avalon:TextEditor>
+
+        <GridSplitter Grid.Row="2" Height="5" Margin="0,-2" HorizontalAlignment="Stretch" ResizeDirection="Rows" Panel.ZIndex="1" />
+        <Border Grid.Row="2" Height="1" Background="{DynamicResource Brush.Border.Subtle}" IsHitTestVisible="False" />
+
+        <DockPanel Grid.Row="3">
+        <Grid DockPanel.Dock="Top">
+        <Border Height="1" VerticalAlignment="Bottom" Background="{DynamicResource Brush.Border.Subtle}" />
+        <DockPanel Margin="4,0,10,0">
+            <Button DockPanel.Dock="Right" Style="{DynamicResource Button.Ghost}" Padding="10,3" VerticalAlignment="Center"
+                    Content="Export" Click="OnExport" AutomationProperties.Name="Export"
+                    Visibility="{Binding Columns, Converter={x:Static app:Converters.NullToCollapsed}}" />
+            <Control themes:Fade.OnShow="True" DockPanel.Dock="Left" Style="{StaticResource PanelTabBase}" Tag="Selected" Cursor="Arrow"
+                     Visibility="{Binding SingleResult, Converter={x:Static app:Converters.BoolToVisibility}}">
+                <Control.Template>
+                    <ControlTemplate TargetType="Control">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal" Margin="10,0" VerticalAlignment="Center">
+                                <TextBlock Text="Result" FontSize="12" Foreground="{DynamicResource Brush.Text.Primary}" />
+                                <TextBlock Text="{Binding Status}" FontSize="11" Margin="7,1,0,0" Foreground="{DynamicResource Brush.Text.Tertiary}" />
+                            </StackPanel>
+                            <Border Height="2" VerticalAlignment="Bottom" Margin="6,0" CornerRadius="1" Background="{DynamicResource Brush.Accent}" />
+                        </Grid>
+                    </ControlTemplate>
+                </Control.Template>
+            </Control>
+            <ListBox themes:Fade.OnShow="True" DockPanel.Dock="Left" ItemsSource="{Binding Results}" SelectedItem="{Binding SelectedResult}"
+                     ItemContainerStyle="{StaticResource ResultChip}" Background="Transparent" BorderThickness="0" Padding="0"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                     Visibility="{Binding Results.Count, Converter={x:Static app:Converters.NullToCollapsed}}"
+                     AutomationProperties.Name="Results">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:QueryResult}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Title}" FontSize="12" />
+                            <TextBlock Text="{Binding Summary}" FontSize="11" Margin="7,1,0,0" Foreground="{DynamicResource Brush.Text.Tertiary}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Button DockPanel.Dock="Left" Style="{StaticResource OutputChip}" Command="{Binding ShowOutputCommand}"
+                    Visibility="{Binding Log.Count, Converter={x:Static app:Converters.NullToCollapsed}}" AutomationProperties.Name="Output">
+                <TextBlock Text="Output" FontSize="12" />
+            </Button>
+            <Border />
+        </DockPanel>
+        </Grid>
+
+        <Grid>
+            <views:ResultGridView x:Name="ResultsGrid" />
+            <ScrollViewer themes:Fade.OnShow="True" Margin="0,0,0,38" Background="{DynamicResource Brush.Bg.App}" BorderThickness="0,1,0,0"
+                          VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                          Visibility="{Binding ShowLog, Converter={x:Static app:Converters.BoolToVisibility}}">
+                <ItemsControl ItemsSource="{Binding Log}" Margin="12,8,12,8" AutomationProperties.Name="Output">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:QueryResult}">
+                            <Grid Margin="0,0,0,10" TextElement.FontFamily="{DynamicResource Font.Mono}" TextElement.FontSize="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="{Binding Time, StringFormat=[{0}]}" Margin="0,0,10,0" Foreground="{DynamicResource Brush.Text.Tertiary}" />
+                                <TextBlock Grid.Column="1" Text="{Binding Sql}" ToolTip="{Binding Sql}" MaxHeight="48"
+                                           TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource Brush.Text.Primary}" />
+                                <TextBox x:Name="Message" Grid.Row="1" Grid.Column="1" Margin="0,2,0,0" Text="{Binding Message, Mode=OneWay}"
+                                         IsReadOnly="True" TextWrapping="Wrap" BorderThickness="0" Background="Transparent" Padding="0"
+                                         FontFamily="{DynamicResource Font.Mono}" FontSize="12" Foreground="{DynamicResource Brush.Text.Secondary}" />
+                            </Grid>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding Failed}" Value="True">
+                                    <Setter TargetName="Message" Property="Foreground" Value="{DynamicResource Brush.Danger}" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+        </DockPanel>
+    </Grid>
+</UserControl>

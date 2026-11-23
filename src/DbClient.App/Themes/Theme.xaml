@@ -1,0 +1,14 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:t="clr-namespace:DbClient.App.Themes">
+    <ResourceDictionary.MergedDictionaries>
+        <t:ThemeResources />
+        <ResourceDictionary Source="/DbClient.App;component/Themes/Tokens.xaml" />
+        <ResourceDictionary Source="/DbClient.App;component/Themes/Buttons.xaml" />
+        <ResourceDictionary Source="/DbClient.App;component/Themes/Inputs.xaml" />
+        <ResourceDictionary Source="/DbClient.App;component/Themes/Lists.xaml" />
+        <ResourceDictionary Source="/DbClient.App;component/Themes/Menus.xaml" />
+        <ResourceDictionary Source="/DbClient.App;component/Themes/Misc.xaml" />
+        <ResourceDictionary Source="/DbClient.App;component/Themes/DataGrid.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

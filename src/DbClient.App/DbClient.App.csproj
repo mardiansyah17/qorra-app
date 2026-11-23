@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\DbClient.Core\DbClient.Core.csproj" />
+    <ProjectReference Include="..\DbClient.ViewModels\DbClient.ViewModels.csproj" />
+    <ProjectReference Include="..\DbClient.Drivers.Postgres\DbClient.Drivers.Postgres.csproj" />
+    <ProjectReference Include="..\DbClient.Drivers.MySql\DbClient.Drivers.MySql.csproj" />
+    <ProjectReference Include="..\DbClient.Drivers.Sqlite\DbClient.Drivers.Sqlite.csproj" />
+    <ProjectReference Include="..\DbClient.Drivers.SqlServer\DbClient.Drivers.SqlServer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AvalonEdit" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <Version>0.1.0</Version>
+    <Product>Qorra</Product>
+    <AssemblyTitle>Qorra</AssemblyTitle>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\app.ico" />
+    <Resource Include="Assets\logo.png" />
+    <Resource Include="Assets\lucide.ttf" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>partial</TrimMode>
+    <_SuppressWpfTrimError>true</_SuppressWpfTrimError>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,1098 @@
+<UserControl x:Class="DbClient.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:app="clr-namespace:DbClient.App"
+             xmlns:themes="clr-namespace:DbClient.App.Themes"
+             xmlns:vm="clr-namespace:DbClient.ViewModels;assembly=DbClient.ViewModels"
+             xmlns:ae="http://icsharpcode.net/sharpdevelop/avalonedit"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:SettingsViewModel}"
+             Width="1060" Height="740" Focusable="True" FocusVisualStyle="{x:Null}" KeyboardNavigation.IsTabStop="False">
+
+    <UserControl.Resources>
+        <Style x:Key="NavItem" TargetType="ListBoxItem">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{DynamicResource Focus.Ring.Inset}" />
+            <Setter Property="AutomationProperties.Name" Value="{Binding Content, RelativeSource={RelativeSource Self}}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Bg" Background="Transparent" CornerRadius="6" Padding="8,5" Margin="0,1">
+                            <StackPanel Orientation="Horizontal">
+                                <Grid Width="26" Height="26">
+                                    <Border CornerRadius="7" Background="{TemplateBinding Foreground}" Opacity="0.16" />
+                                    <TextBlock Text="{TemplateBinding Tag}" Style="{DynamicResource Text.Icon}" FontSize="14" Foreground="{TemplateBinding Foreground}" />
+                                </Grid>
+                                <TextBlock x:Name="Label" Text="{TemplateBinding Content}" Margin="10,0,0,0" FontSize="13.5" VerticalAlignment="Center"
+                                           Foreground="{DynamicResource Brush.Text.Secondary}" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Brush.Bg.Hover}" />
+                                <Setter TargetName="Label" Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Brush.Bg.Selected}" />
+                                <Setter TargetName="Label" Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+                                <Setter TargetName="Label" Property="FontWeight" Value="SemiBold" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="Page" TargetType="ScrollViewer" BasedOn="{StaticResource {x:Type ScrollViewer}}">
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="themes:Fade.OnShow" Value="True" />
+            <Setter Property="Visibility">
+                <Setter.Value>
+                    <MultiBinding Converter="{x:Static app:Converters.AreEqual}">
+                        <Binding Path="Section" />
+                        <Binding Path="Tag" RelativeSource="{RelativeSource Self}" />
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="PageBody" TargetType="StackPanel">
+            <Setter Property="Margin" Value="32,4,32,28" />
+        </Style>
+
+        <Style x:Key="Group" TargetType="TextBlock">
+            <Setter Property="Margin" Value="4,22,0,8" />
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Tertiary}" />
+        </Style>
+        <Style x:Key="Card" TargetType="Border" BasedOn="{StaticResource Border.Card}">
+            <Setter Property="Padding" Value="4" />
+        </Style>
+
+        <Style x:Key="Row" TargetType="DockPanel">
+            <Setter Property="MinHeight" Value="44" />
+            <Setter Property="Background" Value="Transparent" />
+            <Style.Resources>
+                <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+                    <Setter Property="Width" Value="200" />
+                    <Setter Property="DockPanel.Dock" Value="Right" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Margin" Value="0,0,10,0" />
+                </Style>
+                <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                    <Setter Property="Width" Value="200" />
+                    <Setter Property="DockPanel.Dock" Value="Right" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Margin" Value="0,0,10,0" />
+                </Style>
+                <Style TargetType="PasswordBox" BasedOn="{StaticResource {x:Type PasswordBox}}">
+                    <Setter Property="Width" Value="280" />
+                    <Setter Property="DockPanel.Dock" Value="Right" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Margin" Value="0,0,10,0" />
+                </Style>
+                <Style TargetType="CheckBox" BasedOn="{StaticResource CheckBox.Switch}">
+                    <Setter Property="DockPanel.Dock" Value="Right" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Margin" Value="0,0,12,0" />
+                </Style>
+                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                    <Setter Property="DockPanel.Dock" Value="Right" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Margin" Value="0,0,10,0" />
+                    <Setter Property="MinWidth" Value="96" />
+                </Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Margin" Value="12,0,12,0" />
+                    <Setter Property="FontSize" Value="13.5" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource Brush.Bg.Hover}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="Value" TargetType="TextBlock">
+            <Setter Property="DockPanel.Dock" Value="Right" />
+            <Setter Property="Margin" Value="0,0,12,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontFamily" Value="{DynamicResource Font.Mono}" />
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
+        </Style>
+
+        <Style x:Key="Segmented" TargetType="TabControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <StackPanel>
+                            <Border HorizontalAlignment="Left" Padding="3" CornerRadius="8" Background="{DynamicResource Brush.Bg.Track}"
+                                    BorderBrush="{DynamicResource Brush.Border.Subtle}" BorderThickness="1">
+                                <TabPanel IsItemsHost="True" />
+                            </Border>
+                            <ContentPresenter ContentSource="SelectedContent" Margin="0,4,0,0" />
+                        </StackPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="Segment" TargetType="TabItem">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{DynamicResource Focus.Ring.Inset}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="Bg" CornerRadius="6" Padding="16,5" Background="Transparent">
+                            <TextBlock x:Name="Label" Text="{TemplateBinding Header}" FontSize="13" Foreground="{DynamicResource Brush.Text.Secondary}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Label" Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Brush.Bg.SurfaceRaised}" />
+                                <Setter TargetName="Label" Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+                                <Setter TargetName="Label" Property="FontWeight" Value="SemiBold" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="Choice" TargetType="RadioButton">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{DynamicResource Focus.Ring.Inset}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Bg" CornerRadius="5" Padding="10,3" Background="Transparent">
+                            <ContentPresenter x:Name="Label" TextElement.Foreground="{DynamicResource Brush.Text.Secondary}" TextElement.FontSize="12.5" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Brush.Bg.SurfaceRaised}" />
+                                <Setter TargetName="Label" Property="TextElement.Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="Choices" TargetType="Border">
+            <Setter Property="DockPanel.Dock" Value="Right" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+            <Setter Property="Padding" Value="2" />
+            <Setter Property="CornerRadius" Value="7" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Background" Value="{DynamicResource Brush.Bg.Track}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border.Subtle}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style x:Key="Key" TargetType="Border">
+            <Setter Property="Margin" Value="4,0,0,0" />
+            <Setter Property="Padding" Value="7,2" />
+            <Setter Property="MinWidth" Value="24" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="Background" Value="{DynamicResource Brush.Bg.Input}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border.Default}" />
+            <Setter Property="BorderThickness" Value="1,1,1,2" />
+        </Style>
+
+        <Style x:Key="Pick" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+            <Setter Property="Width" Value="200" />
+            <Setter Property="DockPanel.Dock" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+            <Setter Property="DisplayMemberPath" Value="Label" />
+            <Setter Property="SelectedValuePath" Value="Value" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="232" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <Border Background="{DynamicResource Brush.Bg.Sidebar}" CornerRadius="8,0,0,8"
+                BorderBrush="{DynamicResource Brush.Border.Subtle}" BorderThickness="0,0,1,0">
+            <DockPanel Margin="12,18,12,12">
+                <TextBlock DockPanel.Dock="Top" Text="Settings" Style="{DynamicResource Text.Subtitle}" Margin="8,0,0,14" />
+                <TextBlock DockPanel.Dock="Bottom" Margin="8,8,0,0" Style="{DynamicResource Text.Caption}" Foreground="{DynamicResource Brush.Text.Tertiary}">
+                    <Run Text="Qorra" /><Run Text=" " /><Run Text="{x:Static vm:SettingsViewModel.Version}" />
+                </TextBlock>
+                <ListBox SelectedValuePath="Content" SelectedValue="{Binding Section}" ItemContainerStyle="{StaticResource NavItem}"
+                         Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         AutomationProperties.Name="Sections">
+                    <ListBoxItem Content="General" Tag="&#xE154;" Foreground="{DynamicResource Brush.Text.Secondary}" />
+                    <ListBoxItem Content="Fonts &amp; Themes" Tag="&#xE1DD;" Foreground="{DynamicResource Brush.Icon.Routine}" />
+                    <ListBoxItem Content="Editor" Tag="&#xE093;" Foreground="{DynamicResource Brush.Warning}" />
+                    <ListBoxItem Content="Data Table" Tag="&#xE17D;" Foreground="{DynamicResource Brush.Accent}" />
+                    <ListBoxItem Content="Query" Tag="&#xE13C;" Foreground="{DynamicResource Brush.Success}" />
+                    <ListBoxItem Content="Connections" Tag="&#xE37F;" Foreground="{DynamicResource Brush.Icon.View}" />
+                    <ListBoxItem Content="Security" Tag="&#xE1FF;" Foreground="{DynamicResource Brush.Danger}" />
+                    <ListBoxItem Content="Keymap" Tag="&#xE284;" Foreground="{DynamicResource Brush.Text.Secondary}" />
+                    <ListBoxItem Content="Import &amp; Export" Tag="&#xE0B2;" Foreground="{DynamicResource Brush.Icon.Index}" />
+                    <ListBoxItem Content="Advanced" Tag="&#xE1B1;" Foreground="{DynamicResource Brush.Text.Secondary}" />
+                    <ListBoxItem Content="About" Tag="&#xE0F9;" Foreground="{DynamicResource Brush.Accent}" />
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <DockPanel Margin="36,18,14,6">
+                <Button DockPanel.Dock="Right" Style="{DynamicResource Button.Icon}" Content="&#xE1B2;" FontSize="12" VerticalAlignment="Top"
+                        Command="{Binding DoneCommand}" ToolTip="Close (Esc)" AutomationProperties.Name="Close" />
+                <TextBlock Text="{Binding Section}" Style="{DynamicResource Text.Title}" VerticalAlignment="Center" />
+            </DockPanel>
+
+            <Grid Grid.Row="1">
+                <ScrollViewer Tag="General" Style="{StaticResource Page}">
+                    <StackPanel Style="{StaticResource PageBody}">
+                        <TextBlock Text="STARTUP" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.LaunchChoices}" SelectedValue="{Binding S.LaunchOpen}" AutomationProperties.Name="On launch" />
+                                    <TextBlock Text="On launch, open" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.RestoreTabs}" AutomationProperties.Name="Restore tabs" />
+                                    <TextBlock Text="Restore tabs per connection" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.NewWindowPerConnection}" AutomationProperties.Name="Open connections in new window" />
+                                    <TextBlock Text="Open each connection in a new window" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="BEHAVIOR" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.ConfirmQuit}" AutomationProperties.Name="Confirm before quitting" />
+                                    <TextBlock Text="Confirm before quitting with unsaved changes" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.AutosaveChoices}" SelectedValue="{Binding S.Autosave}" AutomationProperties.Name="Autosave workspace" />
+                                    <TextBlock Text="Autosave workspace" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer Tag="Fonts &amp; Themes" Style="{StaticResource Page}">
+                    <StackPanel Style="{StaticResource PageBody}">
+                        <TabControl Style="{StaticResource Segmented}" Margin="0,14,0,0">
+                            <TabItem Header="SQL Editor" Style="{StaticResource Segment}">
+                                <StackPanel>
+                                    <TextBlock Text="FONT" Style="{StaticResource Group}" />
+                                    <Border Style="{StaticResource Card}">
+                                        <StackPanel>
+                                            <DockPanel Style="{StaticResource Row}">
+                                                <ComboBox ItemsSource="{x:Static vm:SettingsViewModel.MonoFonts}" IsEditable="True" Text="{Binding S.EditorFontFamily, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Font family" />
+                                                <TextBlock Text="Font family" />
+                                            </DockPanel>
+                                            <DockPanel Style="{StaticResource Row}">
+                                                <ComboBox ItemsSource="{x:Static vm:SettingsViewModel.EditorFontSizes}" SelectedItem="{Binding EditorFontSize}" AutomationProperties.Name="Font size" />
+                                                <TextBlock Text="Font size" />
+                                            </DockPanel>
+                                            <DockPanel Style="{StaticResource Row}">
+                                                <ComboBox ItemsSource="{x:Static vm:SettingsViewModel.FontWeightNames}" SelectedItem="{Binding S.EditorFontWeight}" AutomationProperties.Name="Font weight" />
+                                                <TextBlock Text="Font weight" />
+                                            </DockPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <TextBlock Text="PREVIEW" Style="{StaticResource Group}" />
+                                    <Border x:Name="PreviewCard" Style="{StaticResource Border.Card}" ClipToBounds="True">
+                                        <ae:TextEditor x:Name="Preview" IsReadOnly="True" IsHitTestVisible="False" ShowLineNumbers="True"
+                                                       Padding="10,12" Height="196" BorderThickness="0" Background="Transparent"
+                                                       FontFamily="{DynamicResource Font.Editor}"
+                                                       FontWeight="{DynamicResource Font.Weight.Editor}"
+                                                       FontSize="{DynamicResource Font.Size.Editor}"
+                                                       HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"
+                                                       AutomationProperties.Name="Preview" />
+                                    </Border>
+
+                                    <Grid Margin="0,22,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="5*" />
+                                            <ColumnDefinition Width="16" />
+                                            <ColumnDefinition Width="6*" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <DockPanel Margin="4,0,0,8" Height="24">
+                                                <TextBlock Text="COLOR SCHEME" Style="{StaticResource Group}" Margin="0" VerticalAlignment="Center" />
+                                            </DockPanel>
+                                            <Border Style="{StaticResource Card}">
+                                                <ListBox ItemsSource="{x:Static vm:SettingsViewModel.Schemes}" SelectedValuePath="Name" SelectedValue="{Binding EditorTheme}"
+                                                         Height="404" Background="Transparent" BorderThickness="0" AutomationProperties.Name="Color scheme">
+                                                    <ListBox.ItemTemplate>
+                                                        <DataTemplate DataType="vm:SchemeItem">
+                                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                <Border Width="44" Height="32" CornerRadius="5" Background="{Binding Background, Converter={x:Static app:Converters.HexToBrush}}"
+                                                                        BorderBrush="{DynamicResource Brush.Border.Default}" BorderThickness="1">
+                                                                    <StackPanel Margin="6,6,0,0">
+                                                                        <StackPanel Orientation="Horizontal">
+                                                                            <Rectangle Width="10" Height="3" RadiusX="1" RadiusY="1" Fill="{Binding Keyword, Converter={x:Static app:Converters.HexToBrush}}" />
+                                                                            <Rectangle Width="14" Height="3" RadiusX="1" RadiusY="1" Margin="3,0,0,0" Fill="{Binding String, Converter={x:Static app:Converters.HexToBrush}}" />
+                                                                        </StackPanel>
+                                                                        <Rectangle Width="18" Height="3" RadiusX="1" RadiusY="1" Margin="0,4,0,0" HorizontalAlignment="Left" Fill="{Binding Function, Converter={x:Static app:Converters.HexToBrush}}" />
+                                                                        <Rectangle Width="8" Height="3" RadiusX="1" RadiusY="1" Margin="0,4,0,0" HorizontalAlignment="Left" Fill="{Binding Keyword, Converter={x:Static app:Converters.HexToBrush}}" />
+                                                                    </StackPanel>
+                                                                </Border>
+                                                                <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                                                    <TextBlock Text="{Binding Name}" FontSize="13.5" />
+                                                                    <TextBlock Text="{Binding Kind}" Style="{DynamicResource Text.Caption}" Foreground="{DynamicResource Brush.Text.Tertiary}" />
+                                                                </StackPanel>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ListBox.ItemTemplate>
+                                                </ListBox>
+                                            </Border>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <DockPanel Margin="4,0,0,8" Height="24">
+                                                <TextBlock Text="TOKEN COLORS" Style="{StaticResource Group}" Margin="0" VerticalAlignment="Center" />
+                                            </DockPanel>
+                                            <Border Style="{StaticResource Card}">
+                                                <ItemsControl ItemsSource="{Binding Tokens}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate DataType="vm:TokenColor">
+                                                            <DockPanel Style="{StaticResource Row}" MinHeight="36">
+                                                                <Border DockPanel.Dock="Right" Width="56" Height="20" Margin="0,0,10,0" CornerRadius="4" Background="{Binding Color, Converter={x:Static app:Converters.HexToBrush}}"
+                                                                        BorderBrush="{DynamicResource Brush.Border.Default}" BorderThickness="1" />
+                                                                <TextBlock DockPanel.Dock="Right" Text="{Binding Hex}" Style="{StaticResource Value}" Foreground="{DynamicResource Brush.Accent}" />
+                                                                <TextBlock Text="{Binding Name}" />
+                                                            </DockPanel>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </Border>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </TabItem>
+
+                            <TabItem Header="Data Table" Style="{StaticResource Segment}">
+                                <StackPanel>
+                                    <TextBlock Text="FONT" Style="{StaticResource Group}" />
+                                    <Border Style="{StaticResource Card}">
+                                        <StackPanel>
+                                            <DockPanel Style="{StaticResource Row}">
+                                                <ComboBox ItemsSource="{x:Static vm:SettingsViewModel.GridFonts}" IsEditable="True" Text="{Binding S.GridFontFamily, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Grid font" />
+                                                <TextBlock Text="Font family" />
+                                            </DockPanel>
+                                            <DockPanel Style="{StaticResource Row}">
+                                                <ComboBox ItemsSource="{x:Static vm:SettingsViewModel.GridFontSizes}" SelectedItem="{Binding S.GridFontSize}" AutomationProperties.Name="Grid font size" />
+                                                <TextBlock Text="Font size" />
+                                            </DockPanel>
+                                            <DockPanel Style="{StaticResource Row}">
+                                                <Border Style="{StaticResource Choices}">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <RadioButton Style="{StaticResource Choice}" GroupName="Density" Content="Compact" IsChecked="{Binding S.RowDensity, Converter={x:Static app:Converters.Is}, ConverterParameter=Compact}" />
+                                                        <RadioButton Style="{StaticResource Choice}" GroupName="Density" Content="Default" IsChecked="{Binding S.RowDensity, Converter={x:Static app:Converters.Is}, ConverterParameter=Default}" />
+                                                        <RadioButton Style="{StaticResource Choice}" GroupName="Density" Content="Comfortable" IsChecked="{Binding S.RowDensity, Converter={x:Static app:Converters.Is}, ConverterParameter=Comfortable}" />
+                                                    </StackPanel>
+                                                </Border>
+                                                <TextBlock Text="Row density" />
+                                            </DockPanel>
+                                            <DockPanel Style="{StaticResource Row}">
+                                                <CheckBox IsChecked="{Binding S.AlternatingRows}" AutomationProperties.Name="Alternating rows" />
+                                                <TextBlock Text="Alternating row colors" />
+                                            </DockPanel>
+                                            <DockPanel Style="{StaticResource Row}">
+                                                <CheckBox IsChecked="{Binding S.GridLines}" AutomationProperties.Name="Grid lines" />
+                                                <TextBlock Text="Vertical grid lines" />
+                                            </DockPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <TextBlock Text="PREVIEW" Style="{StaticResource Group}" />
+                                    <Border Style="{StaticResource Border.Card}" ClipToBounds="True">
+                                        <DataGrid ItemsSource="{x:Static vm:SettingsViewModel.PreviewRows}" AutoGenerateColumns="False" IsReadOnly="True"
+                                                  HeadersVisibility="Column" IsHitTestVisible="False">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="id" Binding="{Binding Id}" Width="60" />
+                                                <DataGridTextColumn Header="name" Binding="{Binding Name}" Width="*" />
+                                                <DataGridTextColumn Header="email" Binding="{Binding Email}" Width="*" />
+                                                <DataGridTextColumn Header="country" Binding="{Binding Country, TargetNullValue=NULL}" Width="90" />
+                                                <DataGridTextColumn Header="created__at" Binding="{Binding Created}" Width="140" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </Border>
+                                </StackPanel>
+                            </TabItem>
+
+                            <TabItem Header="Application" Style="{StaticResource Segment}">
+                                <StackPanel>
+                                    <TextBlock Text="APPEARANCE" Style="{StaticResource Group}" />
+                                    <ListBox ItemsSource="{x:Static vm:SettingsViewModel.Themes}" SelectedItem="{Binding Theme}"
+                                             Background="Transparent" BorderThickness="0" AutomationProperties.Name="Theme">
+                                        <ListBox.ItemsPanel>
+                                            <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                                        </ListBox.ItemsPanel>
+                                        <ListBox.ItemContainerStyle>
+                                            <Style TargetType="ListBoxItem">
+                                                <Setter Property="Cursor" Value="Hand" />
+                                                <Setter Property="Margin" Value="0,0,12,0" />
+                                                <Setter Property="FocusVisualStyle" Value="{DynamicResource Focus.Ring.Inset}" />
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="ListBoxItem">
+                                                            <StackPanel>
+                                                                <Border x:Name="Frame" Width="150" Height="92" CornerRadius="8" BorderThickness="2"
+                                                                        BorderBrush="{DynamicResource Brush.Border.Subtle}" Background="{DynamicResource Brush.Bg.Surface}">
+                                                                    <TextBlock x:Name="Glyph" Style="{DynamicResource Text.Icon}" FontSize="26" Foreground="{DynamicResource Brush.Text.Secondary}" Text="&#xE11D;" />
+                                                                </Border>
+                                                                <TextBlock Text="{Binding}" HorizontalAlignment="Center" Margin="0,8,0,0" FontSize="13" Foreground="{DynamicResource Brush.Text.Primary}" />
+                                                            </StackPanel>
+                                                            <ControlTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding}" Value="Light">
+                                                                    <Setter TargetName="Glyph" Property="Text" Value="&#xE178;" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding}" Value="Dark">
+                                                                    <Setter TargetName="Glyph" Property="Text" Value="&#xE11E;" />
+                                                                </DataTrigger>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource Brush.Border.Strong}" />
+                                                                </Trigger>
+                                                                <Trigger Property="IsSelected" Value="True">
+                                                                    <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+                                                                    <Setter TargetName="Glyph" Property="Foreground" Value="{DynamicResource Brush.Accent}" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </ListBox.ItemContainerStyle>
+                                    </ListBox>
+                                </StackPanel>
+                            </TabItem>
+                        </TabControl>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer Tag="Editor" Style="{StaticResource Page}">
+                    <StackPanel Style="{StaticResource PageBody}">
+                        <TextBlock Text="DISPLAY" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.LineNumbers}" AutomationProperties.Name="Line numbers" />
+                                    <TextBlock Text="Line numbers" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.HighlightStatement}" AutomationProperties.Name="Highlight current statement" />
+                                    <TextBlock Text="Highlight current statement" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.WordWrap}" AutomationProperties.Name="Word wrap" />
+                                    <TextBlock Text="Word wrap" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.ShowWhitespace}" AutomationProperties.Name="Show whitespace" />
+                                    <TextBlock Text="Show whitespace" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.MatchBrackets}" AutomationProperties.Name="Bracket matching" />
+                                    <TextBlock Text="Highlight matching brackets" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="TYPING" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox ItemsSource="{x:Static vm:SettingsViewModel.TabSizes}" SelectedItem="{Binding S.TabSize}" AutomationProperties.Name="Tab size" />
+                                    <TextBlock Text="Tab size" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.InsertSpaces}" AutomationProperties.Name="Insert spaces" />
+                                    <TextBlock Text="Insert spaces for tab" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.AutoClosePairs}" AutomationProperties.Name="Auto close" />
+                                    <TextBlock Text="Auto-close brackets and quotes" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <Border Style="{StaticResource Choices}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton Style="{StaticResource Choice}" GroupName="KeywordCase" Content="UPPER" IsChecked="{Binding S.KeywordCase, Converter={x:Static app:Converters.Is}, ConverterParameter=Upper}" />
+                                            <RadioButton Style="{StaticResource Choice}" GroupName="KeywordCase" Content="lower" IsChecked="{Binding S.KeywordCase, Converter={x:Static app:Converters.Is}, ConverterParameter=Lower}" />
+                                            <RadioButton Style="{StaticResource Choice}" GroupName="KeywordCase" Content="As typed" IsChecked="{Binding S.KeywordCase, Converter={x:Static app:Converters.Is}, ConverterParameter=AsTyped}" />
+                                        </StackPanel>
+                                    </Border>
+                                    <TextBlock Text="Keyword case" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="AUTOCOMPLETE" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.SuggestWhileTyping}" AutomationProperties.Name="Suggest while typing" />
+                                    <TextBlock Text="Suggest while typing" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.SuggestDelays}" SelectedValue="{Binding S.SuggestDelay}" AutomationProperties.Name="Suggestion delay" />
+                                    <TextBlock Text="Delay" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.FuzzyMatching}" AutomationProperties.Name="Fuzzy matching" />
+                                    <TextBlock Text="Fuzzy matching" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.JoinSuggestions}" AutomationProperties.Name="Join suggestions" />
+                                    <TextBlock Text="Suggest JOIN conditions from foreign keys" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.AliasColumns}" AutomationProperties.Name="Qualify columns" />
+                                    <TextBlock Text="Insert table alias with columns" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="INSPECTIONS" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.CheckOnServer}" AutomationProperties.Name="Check on server" />
+                                    <TextBlock Text="Check syntax on server while typing" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.WarnUnknownTables}" AutomationProperties.Name="Unknown tables" />
+                                    <TextBlock Text="Warn on unknown tables" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="FORMATTER" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <Border Style="{StaticResource Choices}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton Style="{StaticResource Choice}" GroupName="Comma" Content="Trailing" IsChecked="{Binding S.CommaPosition, Converter={x:Static app:Converters.Is}, ConverterParameter=Trailing}" />
+                                            <RadioButton Style="{StaticResource Choice}" GroupName="Comma" Content="Leading" IsChecked="{Binding S.CommaPosition, Converter={x:Static app:Converters.Is}, ConverterParameter=Leading}" />
+                                        </StackPanel>
+                                    </Border>
+                                    <TextBlock Text="Comma position" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.AlignClauses}" AutomationProperties.Name="Align" />
+                                    <TextBlock Text="Align clauses" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.FormatOnSave}" AutomationProperties.Name="Format on save" />
+                                    <TextBlock Text="Format on save" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer Tag="Data Table" Style="{StaticResource Page}">
+                    <StackPanel Style="{StaticResource PageBody}">
+                        <TextBlock Text="LOADING" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox ItemsSource="{x:Static vm:SettingsViewModel.PageSizes}" SelectedItem="{Binding PageSize}" AutomationProperties.Name="Rows per page" />
+                                    <TextBlock Text="Rows per page" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.EstimatedRowCount}" AutomationProperties.Name="Estimate row count" />
+                                    <TextBlock Text="Show estimated row count" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.OrderByKey}" AutomationProperties.Name="Order by primary key" />
+                                    <TextBlock Text="Order by primary key by default" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="DISPLAY" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <TextBox Text="{Binding S.NullText, UpdateSourceTrigger=PropertyChanged}" FontFamily="{DynamicResource Font.Mono}" AutomationProperties.Name="Null text" />
+                                    <TextBlock Text="NULL text" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.DateFormats}" SelectedValue="{Binding S.DateFormat}" AutomationProperties.Name="Date format" />
+                                    <TextBlock Text="Date format" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.NumberFormats}" SelectedValue="{Binding S.NumberFormat}" AutomationProperties.Name="Number format" />
+                                    <TextBlock Text="Number format" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <Border Style="{StaticResource Choices}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton Style="{StaticResource Choice}" GroupName="Binary" Content="Hex" IsChecked="{Binding S.BinaryFormat, Converter={x:Static app:Converters.Is}, ConverterParameter=Hex}" />
+                                            <RadioButton Style="{StaticResource Choice}" GroupName="Binary" Content="Base64" IsChecked="{Binding S.BinaryFormat, Converter={x:Static app:Converters.Is}, ConverterParameter=Base64}" />
+                                            <RadioButton Style="{StaticResource Choice}" GroupName="Binary" Content="Text" IsChecked="{Binding S.BinaryFormat, Converter={x:Static app:Converters.Is}, ConverterParameter=Text}" />
+                                        </StackPanel>
+                                    </Border>
+                                    <TextBlock Text="Binary values" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.TruncateChoices}" SelectedValue="{Binding S.TruncateAt}" AutomationProperties.Name="Truncate text" />
+                                    <TextBlock Text="Truncate long text" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.RowNumbers}" AutomationProperties.Name="Row numbers" />
+                                    <TextBlock Text="Row numbers" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.FitColumns}" AutomationProperties.Name="Fit columns" />
+                                    <TextBlock Text="Fit column width to content" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="EDITING" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.ReviewBeforeCommit}" AutomationProperties.Name="Review before commit" />
+                                    <TextBlock Text="Review SQL before commit" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.ConfirmRowDelete}" AutomationProperties.Name="Confirm delete" />
+                                    <TextBlock Text="Confirm row deletion" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <Border Style="{StaticResource Choices}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton Style="{StaticResource Choice}" GroupName="NewRow" Content="Top" IsChecked="{Binding S.NewRowsAtTop}" />
+                                            <RadioButton Style="{StaticResource Choice}" GroupName="NewRow" Content="Bottom" IsChecked="{Binding S.NewRowsAtTop, Converter={x:Static app:Converters.Not}, Mode=OneWay}" Checked="OnNewRowsBottom" />
+                                        </StackPanel>
+                                    </Border>
+                                    <TextBlock Text="Insert new rows at" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.CopyFormats}" SelectedValue="{Binding S.CopyFormat}" AutomationProperties.Name="Copy format" />
+                                    <TextBlock Text="Copy rows as" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer Tag="Query" Style="{StaticResource Page}">
+                    <StackPanel Style="{StaticResource PageBody}">
+                        <TextBlock Text="EXECUTION" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.QueryTimeouts}" SelectedValue="{Binding S.QueryTimeout}" AutomationProperties.Name="Query timeout" />
+                                    <TextBlock Text="Query timeout" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <Border Style="{StaticResource Choices}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton Style="{StaticResource Choice}" GroupName="RunTarget" Content="Statement" IsChecked="{Binding S.RunTarget, Converter={x:Static app:Converters.Is}, ConverterParameter=Statement}" />
+                                            <RadioButton Style="{StaticResource Choice}" GroupName="RunTarget" Content="Script" IsChecked="{Binding S.RunTarget, Converter={x:Static app:Converters.Is}, ConverterParameter=Script}" />
+                                        </StackPanel>
+                                    </Border>
+                                    <TextBlock Text="Ctrl+Enter runs" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.StopOnError}" AutomationProperties.Name="Stop on error" />
+                                    <TextBlock Text="Stop script on first error" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.KeepResults}" AutomationProperties.Name="Keep results" />
+                                    <TextBlock Text="Keep earlier results as tabs" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="TRANSACTIONS" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <Border Style="{StaticResource Choices}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton Style="{StaticResource Choice}" GroupName="TxMode" Content="Auto-commit" IsChecked="{Binding S.ManualCommit, Converter={x:Static app:Converters.Not}, Mode=OneWay}" Checked="OnAutoCommit" />
+                                            <RadioButton Style="{StaticResource Choice}" GroupName="TxMode" Content="Manual" IsChecked="{Binding S.ManualCommit}" />
+                                        </StackPanel>
+                                    </Border>
+                                    <TextBlock Text="Transaction mode" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.IsolationLevels}" SelectedValue="{Binding S.IsolationLevel}" AutomationProperties.Name="Isolation level" />
+                                    <TextBlock Text="Isolation level" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.WarnOpenTransaction}" AutomationProperties.Name="Warn open transaction" />
+                                    <TextBlock Text="Warn on close with open transaction" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="HISTORY" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.SaveHistory}" AutomationProperties.Name="Save history" />
+                                    <TextBlock Text="Save query history" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.HistoryDays}" SelectedValue="{Binding S.HistoryDays}" AutomationProperties.Name="Keep history" />
+                                    <TextBlock Text="Keep history for" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <Button Content="Clear history" Command="{Binding ClearHistoryNowCommand}" />
+                                    <TextBlock Text="Stored queries" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer Tag="Connections" Style="{StaticResource Page}">
+                    <StackPanel Style="{StaticResource PageBody}">
+                        <TextBlock Text="NETWORK" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.ConnectTimeouts}" SelectedValue="{Binding S.ConnectTimeout}" AutomationProperties.Name="Connect timeout" />
+                                    <TextBlock Text="Connect timeout" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.KeepAlives}" SelectedValue="{Binding S.KeepAlive}" AutomationProperties.Name="Keep-alive" />
+                                    <TextBlock Text="Keep-alive ping" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.Reconnect}" AutomationProperties.Name="Reconnect" />
+                                    <TextBlock Text="Reconnect automatically" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.IdleChoices}" SelectedValue="{Binding S.IdleDisconnect}" AutomationProperties.Name="Idle disconnect" />
+                                    <TextBlock Text="Disconnect when idle" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="NEW CONNECTIONS" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.SslDefaults}" SelectedValue="{Binding S.DefaultSslMode}" AutomationProperties.Name="Default SSL mode" />
+                                    <TextBlock Text="SSL mode for remote hosts" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.Tags}" SelectedValue="{Binding DefaultTag}" AutomationProperties.Name="Default tag" />
+                                    <TextBlock Text="Default tag" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.ProductionReadOnly}" AutomationProperties.Name="Production read-only" />
+                                    <TextBlock Text="Production connections start read-only" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="SSH" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.UseSshAgent}" AutomationProperties.Name="Use ssh-agent" />
+                                    <TextBlock Text="Use SSH agent" ToolTip="Windows OpenSSH agent (also 1Password, Bitwarden)" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <Button DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,0,10,0" MinWidth="96" Content="Browse…" Style="{DynamicResource Button.Ghost}" Click="OnBrowseKey" />
+                                    <TextBox Text="{Binding S.DefaultSshKey, UpdateSourceTrigger=PropertyChanged}" themes:Hint.Text="%USERPROFILE%\.ssh\id_ed25519"
+                                             FontFamily="{DynamicResource Font.Mono}" FontSize="12" Width="260" AutomationProperties.Name="Default key" />
+                                    <TextBlock Text="Default private key" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.ShareTunnels}" AutomationProperties.Name="Share tunnel" />
+                                    <TextBlock Text="Share one tunnel per connection" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <Button Content="Manage…" Command="{Binding KnownHostsCommand}" />
+                                    <TextBlock Text="Known hosts" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer Tag="Security" Style="{StaticResource Page}">
+                    <StackPanel Style="{StaticResource PageBody}">
+                        <TextBlock Text="SAFE MODE" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.DangerScopes}" SelectedValue="{Binding S.ConfirmDangerOn}" AutomationProperties.Name="Confirm writes" />
+                                    <TextBlock Text="Confirm dangerous statements on" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.TypeNameToDrop}" AutomationProperties.Name="Type name to drop" />
+                                    <TextBlock Text="Type the name to drop or truncate" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.BlockUnfilteredWrites}" AutomationProperties.Name="Update without where" />
+                                    <TextBlock Text="Block UPDATE / DELETE without WHERE" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.TintWindow}" AutomationProperties.Name="Tag color" />
+                                    <TextBlock Text="Tint window with connection tag color" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="APP LOCK" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.RequireUnlock}" Click="OnUnlockToggle" AutomationProperties.Name="Windows Hello" />
+                                    <TextBlock Text="Require Windows Hello to open" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.LockChoices}" SelectedValue="{Binding S.LockAfter}" AutomationProperties.Name="Lock after" />
+                                    <TextBlock Text="Lock when idle" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.AskBeforeReveal}" AutomationProperties.Name="Reveal password" />
+                                    <TextBlock Text="Ask before revealing saved passwords" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="CREDENTIALS" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <TextBlock Style="{StaticResource Value}" Text="DPAPI · current user" />
+                                    <TextBlock Text="Encryption" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <Button DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,0,10,0" MinWidth="96" Content="Delete all" Style="{DynamicResource Button.Danger}" Command="{Binding ClearPasswordsNowCommand}" />
+                                    <TextBlock Text="Saved passwords" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.ClearCopiedPasswords}" AutomationProperties.Name="Clipboard clear" />
+                                    <TextBlock Text="Clear copied passwords after 30 s" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer Tag="Keymap" Style="{StaticResource Page}">
+                    <StackPanel Style="{StaticResource PageBody}">
+                        <DockPanel Margin="0,16,0,12">
+                            <Button DockPanel.Dock="Right" Content="Reset all" Style="{DynamicResource Button.Ghost}" Margin="10,0,0,0" Command="{Binding ResetShortcutsCommand}" />
+                            <ComboBox DockPanel.Dock="Right" Width="160" Margin="10,0,0,0" ItemsSource="{x:Static vm:SettingsViewModel.KeymapPresets}"
+                                      SelectedItem="{Binding KeymapPreset}" AutomationProperties.Name="Keymap preset" />
+                            <TextBox Text="{Binding ShortcutFilter, UpdateSourceTrigger=PropertyChanged}" themes:Hint.Text="Search actions or keys" AutomationProperties.Name="Search shortcuts" />
+                        </DockPanel>
+                        <Border Style="{StaticResource Card}">
+                            <ItemsControl ItemsSource="{Binding VisibleShortcuts}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="vm:ShortcutItem">
+                                        <DockPanel x:Name="RowPanel" Style="{StaticResource Row}" MinHeight="40" Cursor="Hand" ToolTip="Click, then press the new keys"
+                                                   MouseLeftButtonUp="OnShortcutClick">
+                                            <Button x:Name="ResetButton" DockPanel.Dock="Right" Style="{DynamicResource Button.Icon}" Width="24" Height="24" MinWidth="0" Margin="0,0,8,0"
+                                                    Command="{Binding DataContext.ResetShortcutCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
+                                                    ToolTip="Reset" AutomationProperties.Name="Reset shortcut" Visibility="Hidden">
+                                                <TextBlock Text="&#xE148;" Style="{DynamicResource Text.Icon}" FontSize="11" Margin="0" />
+                                            </Button>
+                                            <Grid DockPanel.Dock="Right" Width="190" Margin="0,0,6,0" VerticalAlignment="Center">
+                                                <ItemsControl x:Name="Keys" ItemsSource="{Binding Parts}" HorizontalAlignment="Right">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Border Style="{StaticResource Key}">
+                                                                <TextBlock Text="{Binding}" Margin="0" FontSize="11.5" HorizontalAlignment="Center" FontFamily="{DynamicResource Font.UI}" />
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                                <TextBlock x:Name="Recording" Text="Press keys…" HorizontalAlignment="Right" Margin="0" Visibility="Collapsed"
+                                                           Foreground="{DynamicResource Brush.Accent}" FontSize="12.5" />
+                                            </Grid>
+                                            <TextBlock DockPanel.Dock="Right" Text="{Binding Conflict}" Margin="0,0,10,0" FontSize="11.5" Foreground="{DynamicResource Brush.Warning}" />
+                                            <TextBlock DockPanel.Dock="Right" Text="{Binding Scope}" Width="70" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="12" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </DockPanel>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                                                <Setter TargetName="Keys" Property="Visibility" Value="Collapsed" />
+                                                <Setter TargetName="Recording" Property="Visibility" Value="Visible" />
+                                                <Setter TargetName="RowPanel" Property="Background" Value="{DynamicResource Brush.Accent.Subtle}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsChanged}" Value="True">
+                                                <Setter TargetName="ResetButton" Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer Tag="Import &amp; Export" Style="{StaticResource Page}">
+                    <StackPanel Style="{StaticResource PageBody}">
+                        <TextBlock Text="EXPORT DEFAULTS" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.ExportFormats}" SelectedValue="{Binding S.ExportFormat}" AutomationProperties.Name="Format" />
+                                    <TextBlock Text="Format" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.Delimiters}" SelectedValue="{Binding S.CsvDelimiter}" AutomationProperties.Name="CSV delimiter" />
+                                    <TextBlock Text="CSV delimiter" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.ExportHeader}" AutomationProperties.Name="Header row" />
+                                    <TextBlock Text="Include header row" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <ComboBox Style="{StaticResource Pick}" ItemsSource="{x:Static vm:SettingsViewModel.Encodings}" SelectedValue="{Binding S.ExportEncoding}" AutomationProperties.Name="Encoding" />
+                                    <TextBlock Text="Encoding" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <Border Style="{StaticResource Choices}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton Style="{StaticResource Choice}" GroupName="Eol" Content="CRLF" IsChecked="{Binding S.LineEndings, Converter={x:Static app:Converters.Is}, ConverterParameter=CRLF}" />
+                                            <RadioButton Style="{StaticResource Choice}" GroupName="Eol" Content="LF" IsChecked="{Binding S.LineEndings, Converter={x:Static app:Converters.Is}, ConverterParameter=LF}" />
+                                        </StackPanel>
+                                    </Border>
+                                    <TextBlock Text="Line endings" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <Button DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,0,10,0" MinWidth="96" Content="Browse…" Style="{DynamicResource Button.Ghost}" Click="OnBrowseFolder" />
+                                    <TextBox Text="{Binding S.ExportFolder, UpdateSourceTrigger=PropertyChanged}" themes:Hint.Text="Last used"
+                                             FontFamily="{DynamicResource Font.Mono}" FontSize="12" Width="260" AutomationProperties.Name="Export folder" />
+                                    <TextBlock Text="Export folder" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="CONNECTIONS" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <Button Content="Export…" Command="{Binding ExportConnectionsNowCommand}" />
+                                    <Button Content="Import…" Command="{Binding ImportConnectionsNowCommand}" />
+                                    <TextBlock Text="Connection list (.json)" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <CheckBox IsChecked="{Binding S.ExportPasswords}" AutomationProperties.Name="Include passwords" />
+                                    <TextBlock Text="Include passwords (encrypted with a passphrase)" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <Button Content="Import" Command="{Binding ImportFromAppCommand}" />
+                                    <ComboBox Style="{StaticResource Pick}" Width="150" ItemsSource="{x:Static vm:SettingsViewModel.ImportSources}" SelectedValue="{Binding ImportSource}" AutomationProperties.Name="Import from" />
+                                    <TextBlock Text="Import from another app" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer Tag="Advanced" Style="{StaticResource Page}">
+                    <StackPanel Style="{StaticResource PageBody}">
+                        <TextBlock Text="STORAGE" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <Button Content="Open" Command="{Binding OpenDataFolderCommand}" />
+                                    <TextBlock Style="{StaticResource Value}" Text="{x:Static vm:SettingsViewModel.DataDirectory}" MaxWidth="360" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="Data folder" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="RESET" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <DockPanel Style="{StaticResource Row}">
+                                <Button DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,0,10,0" MinWidth="96" Content="Reset" Style="{DynamicResource Button.Danger}" Command="{Binding ResetCommand}" />
+                                <TextBlock Text="Restore all settings to defaults" />
+                            </DockPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer Tag="About" Style="{StaticResource Page}">
+                    <StackPanel Style="{StaticResource PageBody}">
+                        <StackPanel Orientation="Horizontal" Margin="4,18,0,4">
+                            <Image Source="/Assets/logo.png" Width="64" Height="64" RenderOptions.BitmapScalingMode="HighQuality" />
+                            <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="Qorra" Style="{DynamicResource Text.Title}" />
+                                <TextBlock Style="{DynamicResource Text.Body}" Foreground="{DynamicResource Brush.Text.Secondary}">
+                                    <Run Text="Version" /><Run Text=" " /><Run Text="{x:Static vm:SettingsViewModel.Version}" />
+                                </TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <TextBlock Text="UPDATES" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <DockPanel Style="{StaticResource Row}">
+                                <Button DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,0,10,0" MinWidth="96" Content="Check now" Style="{DynamicResource Button.Primary}" />
+                                <TextBlock Text="Up to date" />
+                            </DockPanel>
+                        </Border>
+
+                        <TextBlock Text="LINKS" Style="{StaticResource Group}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <TextBlock DockPanel.Dock="Right" Text="&#xE0B9;" Style="{DynamicResource Text.Icon}" FontSize="13" Margin="0,0,14,0" Foreground="{DynamicResource Brush.Text.Tertiary}" />
+                                    <TextBlock Text="Release notes" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <TextBlock DockPanel.Dock="Right" Text="&#xE0B9;" Style="{DynamicResource Text.Icon}" FontSize="13" Margin="0,0,14,0" Foreground="{DynamicResource Brush.Text.Tertiary}" />
+                                    <TextBlock Text="Report a problem" />
+                                </DockPanel>
+                                <DockPanel Style="{StaticResource Row}">
+                                    <TextBlock DockPanel.Dock="Right" Text="&#xE0B9;" Style="{DynamicResource Text.Icon}" FontSize="13" Margin="0,0,14,0" Foreground="{DynamicResource Brush.Text.Tertiary}" />
+                                    <TextBlock Text="Third-party licenses" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+
+            <Border Grid.Row="2" BorderBrush="{DynamicResource Brush.Border.Subtle}" BorderThickness="0,1,0,0" Padding="32,12,20,14">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="Done" MinWidth="96" Style="{DynamicResource Button.Primary}" Command="{Binding DoneCommand}" IsDefault="True" />
+                    <Button DockPanel.Dock="Left" Content="Restore Defaults" Style="{DynamicResource Button.Ghost}" Command="{Binding ResetCommand}" />
+                    <TextBlock Text="{Binding Notice}" Margin="16,0,16,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                               Foreground="{DynamicResource Brush.Text.Secondary}" themes:Fade.OnShow="True" />
+                </DockPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

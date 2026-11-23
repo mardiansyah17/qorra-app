@@ -1,0 +1,315 @@
+﻿<UserControl x:Class="DbClient.App.Controls.SheetHost"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DbClient.ViewModels;assembly=DbClient.ViewModels"
+             xmlns:app="clr-namespace:DbClient.App"
+             xmlns:views="clr-namespace:DbClient.App.Views"
+             xmlns:themes="clr-namespace:DbClient.App.Themes"
+             KeyDown="OnKeyDown">
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type vm:ConnectionEditorViewModel}">
+            <views:ConnectionEditorView Width="780" MaxHeight="820" />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:TableDesignerViewModel}">
+            <views:TableDesignerView />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:ConfirmViewModel}">
+            <StackPanel Margin="24,24,24,20">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Width" Value="420" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Code, Converter={x:Static app:Converters.NullToBool}}" Value="True">
+                                <Setter Property="Width" Value="680" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Border Width="36" Height="36" CornerRadius="18" VerticalAlignment="Top"
+                            Background="{DynamicResource Brush.Danger.Subtle}"
+                            Visibility="{Binding IsSafe, Converter={x:Static app:Converters.TrueToCollapsed}}">
+                        <TextBlock Text="&#xE18E;" Style="{DynamicResource Text.Icon}" FontSize="16"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource Brush.Danger}" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="16,0,0,0">
+                        <TextBlock Text="{Binding Title}" Style="{DynamicResource Text.Subtitle}" />
+                        <TextBlock Text="{Binding Message}" Style="{DynamicResource Text.Body}" Margin="0,6,0,0"
+                                   Foreground="{DynamicResource Brush.Text.Secondary}" TextWrapping="Wrap" />
+                        <TextBox Margin="0,14,0,0" Text="{Binding Code, Mode=OneWay}" IsReadOnly="True" MaxHeight="280"
+                                 FontFamily="{DynamicResource Font.Mono}" FontSize="12" TextWrapping="NoWrap"
+                                 HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                                 Visibility="{Binding Code, Converter={x:Static app:Converters.NullToCollapsed}}" AutomationProperties.Name="SQL" />
+                        <TextBox Margin="0,14,0,0" Text="{Binding Input, UpdateSourceTrigger=PropertyChanged}" themes:Hint.Text="{Binding InputHint}"
+                                 AutomationProperties.Name="{Binding InputHint}" Loaded="OnInputLoaded">
+                            <TextBox.Style>
+                                <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                    <Setter Property="Visibility" Value="{Binding InputHint, Converter={x:Static app:Converters.NullToCollapsed}}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsSecret}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+                        <PasswordBox Margin="0,14,0,0" themes:Hint.Text="{Binding InputHint}" AutomationProperties.Name="{Binding InputHint}"
+                                     PasswordChanged="OnSecretChanged" Loaded="OnInputLoaded"
+                                     Visibility="{Binding IsSecret, Converter={x:Static app:Converters.BoolToVisibility}}" />
+                        <CheckBox Margin="0,12,0,0" Content="{Binding OptionText}" IsChecked="{Binding Option}"
+                                  Visibility="{Binding OptionText, Converter={x:Static app:Converters.NullToCollapsed}}" />
+                    </StackPanel>
+                </Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0">
+                    <Button Content="Cancel" MinWidth="88" Command="{Binding CancelCommand}" ToolTip="Esc" />
+                    <Button Content="{Binding AlternativeText}" MinWidth="88" Margin="8,0,0,0" Command="{Binding AlternativeCommand}"
+                            Visibility="{Binding AlternativeText, Converter={x:Static app:Converters.NullToCollapsed}}" />
+                    <Button Content="{Binding AcceptText}" MinWidth="88" Margin="8,0,0,0" Command="{Binding ConfirmCommand}"
+                            Style="{DynamicResource Button.Danger}" Visibility="{Binding IsSafe, Converter={x:Static app:Converters.TrueToCollapsed}}" />
+                    <Button Content="{Binding AcceptText}" MinWidth="88" Margin="8,0,0,0" Command="{Binding ConfirmCommand}"
+                            Style="{DynamicResource Button.Primary}" Visibility="{Binding IsSafe, Converter={x:Static app:Converters.BoolToVisibility}}" />
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:KnownHostsViewModel}">
+            <DockPanel Width="560" Margin="24,22,24,20">
+                <TextBlock DockPanel.Dock="Top" Text="Known hosts" Style="{DynamicResource Text.Subtitle}" />
+                <DockPanel DockPanel.Dock="Bottom" Margin="0,20,0,0">
+                    <Button DockPanel.Dock="Right" Content="Done" MinWidth="88" Style="{DynamicResource Button.Primary}" Command="{Binding DoneCommand}" IsDefault="True" />
+                    <Border />
+                </DockPanel>
+                <Grid Margin="0,14,0,0">
+                    <TextBlock Text="No trusted SSH hosts yet" Foreground="{DynamicResource Brush.Text.Tertiary}" Margin="0,8"
+                               Visibility="{Binding Hosts.Count, Converter={x:Static app:Converters.NotNullToCollapsed}}" />
+                    <ItemsControl ItemsSource="{Binding Hosts}" MaxHeight="420">
+                        <ItemsControl.Template>
+                            <ControlTemplate TargetType="ItemsControl">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto"><ItemsPresenter /></ScrollViewer>
+                            </ControlTemplate>
+                        </ItemsControl.Template>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel Margin="0,6">
+                                    <Button DockPanel.Dock="Right" Content="Forget" Style="{DynamicResource Button.Ghost}" VerticalAlignment="Center"
+                                            Command="{Binding DataContext.ForgetCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                        <TextBlock Style="{DynamicResource Text.Caption}" Foreground="{DynamicResource Brush.Text.Secondary}">
+                                            <Run Text="{Binding SshUser, Mode=OneWay}" /><Run Text="@" /><Run Text="{Binding SshHost, Mode=OneWay}" /><Run Text=":" /><Run Text="{Binding SshPort, Mode=OneWay}" />
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding SshHostKey}" FontFamily="{DynamicResource Font.Mono}" FontSize="11.5" Margin="0,2,0,0"
+                                                   Foreground="{DynamicResource Brush.Text.Tertiary}" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </DockPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:DatabasePickerViewModel}">
+            <DockPanel Width="540">
+                <DockPanel.Resources>
+                    <Style x:Key="PickerKey" TargetType="Border">
+                        <Setter Property="MinWidth" Value="22" />
+                        <Setter Property="Height" Value="22" />
+                        <Setter Property="Padding" Value="6,0" />
+                        <Setter Property="Margin" Value="0,0,8,0" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="CornerRadius" Value="{DynamicResource Radius.Small}" />
+                        <Setter Property="BorderThickness" Value="1,1,1,2" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border.Default}" />
+                        <Setter Property="Background" Value="{DynamicResource Brush.Bg.Input}" />
+                    </Style>
+                    <Style x:Key="PickerKeyText" TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="11" />
+                        <Setter Property="HorizontalAlignment" Value="Center" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
+                    </Style>
+                    <Style x:Key="PickerKeyIcon" TargetType="TextBlock" BasedOn="{StaticResource Text.Icon}">
+                        <Setter Property="FontSize" Value="10" />
+                        <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
+                    </Style>
+                    <ContextMenu x:Key="PickerMenu" x:Shared="False" DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                        <MenuItem Header="Open" InputGestureText="Enter" Command="{Binding OpenCommand}">
+                            <MenuItem.Icon><TextBlock Text="&#xE426;" Style="{DynamicResource Text.Icon}" /></MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Copy name" Command="{Binding CopyNameCommand}"
+                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                            <MenuItem.Icon><TextBlock Text="&#xE09E;" Style="{DynamicResource Text.Icon}" /></MenuItem.Icon>
+                        </MenuItem>
+                        <Separator Visibility="{Binding CanManage, Converter={x:Static app:Converters.BoolToVisibility}}" />
+                        <MenuItem Header="{Binding NewText}" HeaderStringFormat="{}{0}&#x2026;" Command="{Binding NewCommand}"
+                                  Visibility="{Binding CanManage, Converter={x:Static app:Converters.BoolToVisibility}}">
+                            <MenuItem.Icon><TextBlock Text="&#xE13D;" Style="{DynamicResource Text.Icon}" /></MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Drop&#x2026;" Command="{Binding DropCommand}"
+                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                  IsEnabled="{Binding PlacementTarget.DataContext.CanDrop, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                  Visibility="{Binding CanManage, Converter={x:Static app:Converters.BoolToVisibility}}">
+                            <MenuItem.Icon><TextBlock Text="&#xE18E;" Style="{DynamicResource Text.Icon}" Foreground="{DynamicResource Brush.Danger}" /></MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                    <Style x:Key="PickerRow" TargetType="ListBoxItem" BasedOn="{StaticResource ListRow}">
+                        <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListBox}}" />
+                        <Setter Property="ContextMenu" Value="{StaticResource PickerMenu}" />
+                    </Style>
+                    <Style x:Key="PickerHint" TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="12" />
+                        <Setter Property="Margin" Value="0,0,18,0" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Tertiary}" />
+                    </Style>
+                </DockPanel.Resources>
+
+                <Grid DockPanel.Dock="Top" Height="60" Margin="20,0,12,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="&#xE151;" Style="{DynamicResource Text.Icon}" FontSize="16"
+                               Foreground="{DynamicResource Brush.Text.Tertiary}" />
+                    <TextBox Grid.Column="1" Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}" FontSize="15" Margin="14,0,10,0" Padding="0"
+                             AutomationProperties.Name="{Binding SearchHint}" Loaded="OnInputLoaded" PreviewKeyDown="OnPickerSearchKeyDown">
+                        <TextBox.Template>
+                            <ControlTemplate TargetType="TextBox">
+                                <Grid Background="Transparent">
+                                    <TextBlock x:Name="Hint" Text="{Binding SearchHint}" Foreground="{DynamicResource Brush.Text.Tertiary}" Margin="2,0,0,0"
+                                               VerticalAlignment="Center" IsHitTestVisible="False" Visibility="Collapsed" />
+                                    <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" Focusable="False"
+                                                  HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="Text" Value="">
+                                        <Setter TargetName="Hint" Property="Visibility" Value="Visible" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </TextBox.Template>
+                    </TextBox>
+                    <Border Grid.Column="2" Padding="8,2,8,3" CornerRadius="10" VerticalAlignment="Center" Background="{DynamicResource Brush.Bg.Hover}">
+                        <TextBlock Text="{Binding Items.Count}" FontSize="11.5" Foreground="{DynamicResource Brush.Text.Secondary}" />
+                    </Border>
+                    <Button Grid.Column="3" Style="{DynamicResource Button.Icon}" Width="28" Height="28" Margin="6,0,0,0" VerticalAlignment="Center"
+                            Command="{Binding RefreshCommand}" ToolTip="Refresh (F5)" AutomationProperties.Name="Refresh">
+                        <TextBlock Text="&#xE145;" Style="{DynamicResource Text.Icon}" FontSize="14" Foreground="{DynamicResource Brush.Text.Secondary}" />
+                    </Button>
+                </Grid>
+                <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource Brush.Border.Subtle}" />
+
+                <Border DockPanel.Dock="Bottom" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource Brush.Border.Subtle}"
+                        Background="{DynamicResource Brush.Bg.Sidebar}" CornerRadius="0,0,7,7">
+                    <DockPanel Height="48" Margin="16,0,10,0">
+                        <Button DockPanel.Dock="Right" Style="{DynamicResource Button.Ghost}" Command="{Binding NewCommand}" AutomationProperties.Name="{Binding NewText}"
+                                VerticalAlignment="Center" Visibility="{Binding CanManage, Converter={x:Static app:Converters.BoolToVisibility}}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE13D;" Style="{DynamicResource Text.Icon}" FontSize="13" Margin="0,0,8,0" Foreground="{DynamicResource Brush.Accent}" />
+                                <TextBlock Text="{Binding NewText}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Style="{StaticResource PickerKey}" Margin="0,0,3,0"><TextBlock Text="&#xE04A;" Style="{StaticResource PickerKeyIcon}" /></Border>
+                            <Border Style="{StaticResource PickerKey}"><TextBlock Text="&#xE042;" Style="{StaticResource PickerKeyIcon}" /></Border>
+                            <TextBlock Text="Navigate" Style="{StaticResource PickerHint}" />
+                            <Border Style="{StaticResource PickerKey}"><TextBlock Text="&#xE0A1;" Style="{StaticResource PickerKeyIcon}" /></Border>
+                            <TextBlock Text="Open" Style="{StaticResource PickerHint}" />
+                            <Border Style="{StaticResource PickerKey}"><TextBlock Text="Esc" Style="{StaticResource PickerKeyText}" /></Border>
+                            <TextBlock Text="Close" Style="{StaticResource PickerHint}" />
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+
+                <Grid MinHeight="140" MaxHeight="372">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Visibility="{Binding Items.Count, Converter={x:Static app:Converters.NotNullToCollapsed}}">
+                        <TextBlock Text="&#xE4AD;" Style="{DynamicResource Text.Icon}" FontSize="22" Foreground="{DynamicResource Brush.Text.Tertiary}" />
+                        <TextBlock Text="No matches" Margin="0,10,0,0" HorizontalAlignment="Center" Foreground="{DynamicResource Brush.Text.Tertiary}" />
+                    </StackPanel>
+                    <ListBox ItemsSource="{Binding Items}" SelectedItem="{Binding Selected}" ItemContainerStyle="{StaticResource PickerRow}"
+                             Margin="8" Padding="0" Background="Transparent" BorderThickness="0" Focusable="False"
+                             VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled" MouseDoubleClick="OnPickerItemDoubleClick" SelectionChanged="OnPickerSelectionChanged"
+                             AutomationProperties.Name="Databases">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:DatabaseItem}">
+                                <Grid MinHeight="30">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="Tile" Width="30" Height="30" CornerRadius="8" Background="{DynamicResource Brush.Bg.Hover}">
+                                        <TextBlock x:Name="TileIcon" Text="&#xE0AD;" Style="{DynamicResource Text.Icon}" FontSize="14"
+                                                   Foreground="{DynamicResource Brush.Text.Secondary}" />
+                                    </Border>
+                                    <TextBlock x:Name="Label" Grid.Column="1" Text="{Binding Name}" Margin="12,0,8,0" FontSize="13.5" VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Border x:Name="Badge" Padding="7,2,9,3" CornerRadius="10" VerticalAlignment="Center"
+                                                Background="{DynamicResource Brush.Accent.Subtle}" Visibility="Collapsed">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="&#xE06C;" Style="{DynamicResource Text.Icon}" FontSize="11" Margin="0,0,5,0" Foreground="{DynamicResource Brush.Accent}" />
+                                                <TextBlock Text="Current" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource Brush.Accent}" />
+                                            </StackPanel>
+                                        </Border>
+                                        <Border x:Name="EnterKey" Style="{StaticResource PickerKey}" Margin="8,0,2,0" Visibility="Collapsed">
+                                            <TextBlock Text="&#xE0A1;" Style="{StaticResource PickerKeyIcon}" />
+                                        </Border>
+                                    </StackPanel>
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                        <Setter TargetName="EnterKey" Property="Visibility" Value="Visible" />
+                                        <Setter TargetName="Label" Property="FontWeight" Value="SemiBold" />
+                                        <Setter TargetName="TileIcon" Property="Foreground" Value="{DynamicResource Brush.Accent}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                        <Setter TargetName="Badge" Property="Visibility" Value="Visible" />
+                                        <Setter TargetName="Tile" Property="Background" Value="{DynamicResource Brush.Accent}" />
+                                        <Setter TargetName="TileIcon" Property="Foreground" Value="{DynamicResource Brush.Text.OnAccent}" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </DockPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:SettingsView />
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid>
+        <Border x:Name="Scrim" Background="{DynamicResource Brush.Bg.Overlay}" Opacity="0"
+                WindowChrome.IsHitTestVisibleInChrome="True" MouseDown="OnScrimMouseDown" />
+        <Border x:Name="Card" Style="{DynamicResource Border.Popup}" Margin="32"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                RenderTransformOrigin="0.5,0.5" Opacity="0"
+                Focusable="True" FocusVisualStyle="{x:Null}" KeyboardNavigation.IsTabStop="False"
+                PreviewMouseLeftButtonDown="OnCardMouseDown"
+                KeyboardNavigation.TabNavigation="Cycle"
+                KeyboardNavigation.ControlTabNavigation="Cycle"
+                KeyboardNavigation.DirectionalNavigation="Contained">
+            <Border.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform x:Name="CardScale" ScaleX="0.96" ScaleY="0.96" />
+                    <TranslateTransform x:Name="CardShift" />
+                </TransformGroup>
+            </Border.RenderTransform>
+            <ContentPresenter x:Name="Presenter" />
+        </Border>
+    </Grid>
+</UserControl>

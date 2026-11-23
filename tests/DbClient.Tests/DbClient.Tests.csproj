@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.v3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\DbClient.Core\DbClient.Core.csproj" />
+    <ProjectReference Include="..\..\src\DbClient.ViewModels\DbClient.ViewModels.csproj" />
+    <ProjectReference Include="..\..\src\DbClient.Drivers.Postgres\DbClient.Drivers.Postgres.csproj" />
+    <ProjectReference Include="..\..\src\DbClient.Drivers.MySql\DbClient.Drivers.MySql.csproj" />
+    <ProjectReference Include="..\..\src\DbClient.Drivers.Sqlite\DbClient.Drivers.Sqlite.csproj" />
+    <ProjectReference Include="..\..\src\DbClient.Drivers.SqlServer\DbClient.Drivers.SqlServer.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DbClient.App/DbClient.App.csproj" />
+    <Project Path="src/DbClient.Core/DbClient.Core.csproj" />
+    <Project Path="src/DbClient.Drivers.MySql/DbClient.Drivers.MySql.csproj" />
+    <Project Path="src/DbClient.Drivers.Postgres/DbClient.Drivers.Postgres.csproj" />
+    <Project Path="src/DbClient.Drivers.Sqlite/DbClient.Drivers.Sqlite.csproj" />
+    <Project Path="src/DbClient.Drivers.SqlServer/DbClient.Drivers.SqlServer.csproj" />
+    <Project Path="src/DbClient.ViewModels/DbClient.ViewModels.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DbClient.Tests/DbClient.Tests.csproj" />
+  </Folder>
+</Solution>
