@@ -44,4 +44,11 @@ A few things I care about:
 
 ## Releasing
 
-`build.ps1` publishes and builds the installer (needs Inno Setup 6). Output goes to `artifacts/installer`.
+1. Bump `<Version>` in `Directory.Build.props`, commit and push.
+2. `git tag vX.Y.Z && git push origin vX.Y.Z`. The release workflow runs the tests, builds the installer and
+   publishes the release with generated notes.
+3. Tidy up the notes on GitHub.
+
+`build.ps1` builds the same installer locally (needs Inno Setup 6) into `artifacts/installer`.
+
+The app looks for a newer release on startup and links to its notes, so keep the installer name as is.

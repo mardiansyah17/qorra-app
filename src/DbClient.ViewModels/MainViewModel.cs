@@ -325,9 +325,10 @@ public sealed partial class MainViewModel : ObservableObject
         Notify($"Disconnected from {profile.Name}", $"Idle for {minutes} minutes.", actionText: "Reconnect", action: () => ConnectCommand.Execute(profile));
     }
 
-    public void Notify(string title, string? detail = null, ToastKind kind = ToastKind.Info, string? actionText = null, Action? action = null)
+    public void Notify(string title, string? detail = null, ToastKind kind = ToastKind.Info, string? actionText = null, Action? action = null,
+        string? linkText = null, string? linkUrl = null)
     {
-        var toast = new Toast(title, detail, kind) { ActionText = actionText, Action = action };
+        var toast = new Toast(title, detail, kind) { ActionText = actionText, Action = action, LinkText = linkText, LinkUrl = linkUrl };
         Toasts.Add(toast);
         if (Toasts.Count(t => !t.IsClosing) > 3) DismissToast(Toasts.First(t => !t.IsClosing));
         _ = AutoDismissAsync(toast, kind == ToastKind.Error || action is not null ? 8000 : 4000);
@@ -359,6 +360,12 @@ public sealed partial class MainViewModel : ObservableObject
         if (toast.IsClosing) return;
         DismissToast(toast);
         toast.Action?.Invoke();
+    }
+
+    [RelayCommand]
+    private static void OpenToastLink(Toast toast)
+    {
+        if (toast.LinkUrl is { } url) Platform.OpenUrl(url);
     }
 
     [RelayCommand(CanExecute = nameof(CanActOn), IncludeCancelCommand = true)]

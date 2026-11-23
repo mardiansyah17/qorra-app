@@ -113,7 +113,7 @@ public partial class App : Application
             {
                 vm.Notify($"Downloading Qorra {release.Version}…");
                 if (await Updater.InstallAsync(release, CancellationToken.None) is { } error) vm.Notify("Couldn't update", error, ToastKind.Error);
-            });
+            }, "What's new", release.PageUrl);
         }
 
         void RememberSession()

@@ -1062,6 +1062,9 @@
                                 <DockPanel Style="{StaticResource Row}">
                                     <Button DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,0,10,0" MinWidth="96" Content="{Binding UpdateButtonText}"
                                             Style="{DynamicResource Button.Primary}" Command="{Binding UpdateCommand}" />
+                                    <Button DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,0,12,0" Content="What's new"
+                                            Style="{DynamicResource Button.Link}" Command="{Binding OpenLinkCommand}" CommandParameter="{Binding Available.PageUrl}"
+                                            Visibility="{Binding Available, Converter={x:Static app:Converters.NullToCollapsed}}" />
                                     <TextBlock Text="{Binding UpdateStatus}" />
                                 </DockPanel>
                                 <DockPanel Style="{StaticResource Row}">
