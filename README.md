@@ -1,38 +1,35 @@
 # Qorra
 
-A fast, native database client for Windows. Opens in under a second, streams large tables without loading them, and stays out of your way.
+Database client for Windows. Postgres, MySQL, SQL Server and SQLite.
 
-Supports **PostgreSQL**, **MySQL**, **SQL Server**, and **SQLite**. MariaDB works through the MySQL driver but is less tested.
+I wanted something like TablePlus that starts fast and doesn't choke on big tables, so I wrote one. It's WPF on .NET 10.
+A macOS version is planned (shares everything except the UI).
 
-## Features
+What it does:
 
-- **Data grid**: virtualized and streamed in pages, so million-row tables open instantly. Edit cells, insert and delete rows, review the SQL, then save in one transaction.
-- **SQL editor**: context-aware autocomplete (joins from foreign keys, aliases, CTEs), live error checking against the server, formatter, explain, run statement at cursor or the whole script.
-- **Schema browser**: tables, views, columns, keys, indexes, functions, enums, and sequences, loaded lazily.
-- **Table designer**: edit columns, indexes, foreign keys, and checks, with a preview of the generated `ALTER` script.
-- **Connections**: SSH tunnels (password, key, or agent), SSL, read-only mode, color tags with safety prompts for production.
-- **Workspace**: tabs, filters, and unsaved queries are restored per connection.
-- **Import & export**: CSV, JSON, SQL `INSERT`, Markdown; import connections from DBeaver, DataGrip, and HeidiSQL.
+- browse schemas, open tables, edit rows and save them in one transaction
+- SQL editor with autocomplete, error checking and formatting
+- table designer (columns, indexes, foreign keys)
+- SSH tunnels and SSL
+- export to CSV / JSON / SQL, import connections from DBeaver, DataGrip, HeidiSQL
 
-Passwords are encrypted with Windows DPAPI and never stored in the connection list.
+MariaDB should work through the MySQL driver but I haven't tested it much.
 
 ## Install
 
-Download the latest installer from [Releases](../../releases).
+Grab the installer from [Releases](../../releases). Windows 10 1809+ x64.
 
-Requires Windows 10 (1809) or later, x64.
+## Build
 
-## Build from source
-
-Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download).
-
-```powershell
+```
 dotnet build Qorra.Windows.slnx
 dotnet run --project src/DbClient.App
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for tests, architecture, and the installer build.
+Needs the .NET 10 SDK. More in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+The projects are still called `DbClient.*`, that was the working name before Qorra.
 
 ## License
 
-[MIT](LICENSE)
+MIT
