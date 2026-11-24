@@ -373,7 +373,7 @@ public partial class QueryTabView : UserControl
         {
             if (text.Length <= 200_000)
             {
-                foreach (var s in prefs.CheckOnServer ? SqlScript.Split(text).Take(50) : [])
+                foreach (var s in prefs.CheckOnServer ? SqlScript.Batches(text, SqlScript.Split(text)).Take(50) : [])
                     if (await vm.CheckAsync(s.Text(text), cts.Token) is { } p) found.Add((s.Start, p, true));
                 if (prefs.WarnUnknownTables && vm.Catalog is { } catalog)
                     foreach (var p in await SqlCompletion.UnknownTablesAsync(text, catalog, cts.Token))
