@@ -330,8 +330,15 @@ public sealed partial class MainViewModel : ObservableObject
     {
         var toast = new Toast(title, detail, kind) { ActionText = actionText, Action = action, LinkText = linkText, LinkUrl = linkUrl };
         Toasts.Add(toast);
-        if (Toasts.Count(t => !t.IsClosing) > 3) DismissToast(Toasts.First(t => !t.IsClosing));
+        if (Toasts.Count(t => !t.IsClosing) > 3) DismissToast(Toasts.First(t => !t.IsClosing && t.Progress is null));
         _ = AutoDismissAsync(toast, kind == ToastKind.Error || action is not null ? 8000 : 4000);
+    }
+
+    public Toast ShowProgress(string title)
+    {
+        var toast = new Toast(title, null, ToastKind.Info) { Progress = 0 };
+        Toasts.Add(toast);
+        return toast;
     }
 
     private async Task AutoDismissAsync(Toast toast, int delayMs)

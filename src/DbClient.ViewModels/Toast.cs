@@ -15,4 +15,6 @@ public sealed partial class Toast(string title, string? detail, ToastKind kind) 
     public string? LinkUrl { get; init; }
 
     [ObservableProperty] public partial bool IsClosing { get; set; }
+
+    [ObservableProperty] public partial double? Progress { get; set; }
 }

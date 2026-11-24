@@ -111,8 +111,10 @@ public partial class App : Application
             if (OpenViewModels().FirstOrDefault() is not { } vm) return;
             vm.Notify($"Qorra {release.Version} is available", null, ToastKind.Info, "Update", async () =>
             {
-                vm.Notify($"Downloading Qorra {release.Version}…");
-                if (await Updater.InstallAsync(release, CancellationToken.None) is { } error) vm.Notify("Couldn't update", error, ToastKind.Error);
+                var toast = vm.ShowProgress($"Downloading Qorra {release.Version}…");
+                var error = await Updater.InstallAsync(release, new Progress<double>(p => toast.Progress = p), CancellationToken.None);
+                vm.DismissToastCommand.Execute(toast);
+                if (error is not null) vm.Notify("Couldn't update", error, ToastKind.Error);
             }, "What's new", release.PageUrl);
         }
 

@@ -327,7 +327,8 @@ public sealed partial class SettingsViewModel : SheetViewModel
         if (Available is { } release)
         {
             UpdateStatus = $"Downloading {release.Version}…";
-            UpdateStatus = await Updater.InstallAsync(release, ct) ?? $"Version {release.Version} is available";
+            var progress = new Progress<double>(p => UpdateStatus = $"Downloading {release.Version}… {p * 100:0}%");
+            UpdateStatus = await Updater.InstallAsync(release, progress, ct) ?? $"Version {release.Version} is available";
             return;
         }
         UpdateStatus = "Checking…";

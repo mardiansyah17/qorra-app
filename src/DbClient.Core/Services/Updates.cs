@@ -57,7 +57,7 @@ public static class Updates
         return new AppRelease(Normalize(version), page, url, sha);
     }
 
-    public static async Task<string> DownloadAsync(AppRelease release, CancellationToken ct)
+    public static async Task<string> DownloadAsync(AppRelease release, IProgress<double>? progress, CancellationToken ct)
     {
         if (release.InstallerUrl is null) throw new InvalidOperationException("This release has no installer.");
         var path = Path.Combine(Path.GetTempPath(), $"Qorra-Setup-{release.Version}.exe");
@@ -65,9 +65,22 @@ public static class Updates
         using (var response = await Http.GetAsync(release.InstallerUrl, HttpCompletionOption.ResponseHeadersRead, ct))
         {
             response.EnsureSuccessStatusCode();
+            var total = response.Content.Headers.ContentLength ?? 0;
             await using var source = await response.Content.ReadAsStreamAsync(ct);
             await using var file = File.Create(partial);
-            await source.CopyToAsync(file, ct);
+            var buffer = new byte[81920];
+            long done = 0;
+            var reported = -1;
+            int read;
+            while ((read = await source.ReadAsync(buffer, ct)) > 0)
+            {
+                await file.WriteAsync(buffer.AsMemory(0, read), ct);
+                done += read;
+                var percent = total > 0 ? (int)(done * 100 / total) : 0;
+                if (percent == reported) continue;
+                reported = percent;
+                progress?.Report(percent / 100.0);
+            }
         }
         if (release.Sha256 is { } expected)
         {

@@ -32,6 +32,8 @@
                             <Button Content="{Binding LinkText}" Style="{DynamicResource Button.Link}" HorizontalAlignment="Left" Margin="0,4,0,0"
                                     Command="{Binding DataContext.OpenToastLinkCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
                                     Visibility="{Binding LinkText, Converter={x:Static app:Converters.NullToCollapsed}}" />
+                            <ProgressBar Value="{Binding Progress, Mode=OneWay}" Maximum="1" Margin="0,8,0,0"
+                                         Visibility="{Binding Progress, Converter={x:Static app:Converters.NullToCollapsed}}" />
                         </StackPanel>
                         <Button Grid.Column="2" Content="{Binding ActionText}" Style="{DynamicResource Button.Link}"
                                 Margin="8,0,0,0" VerticalAlignment="Center"

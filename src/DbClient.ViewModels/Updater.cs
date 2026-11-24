@@ -22,7 +22,7 @@ public static class Updater
         }
     }
 
-    public static async Task<string?> InstallAsync(AppRelease release, CancellationToken ct)
+    public static async Task<string?> InstallAsync(AppRelease release, IProgress<double>? progress, CancellationToken ct)
     {
         if (release.InstallerUrl is null)
         {
@@ -30,7 +30,7 @@ public static class Updater
             return null;
         }
         string path;
-        try { path = await Updates.DownloadAsync(release, ct); }
+        try { path = await Updates.DownloadAsync(release, progress, ct); }
         catch (Exception ex) when (IsExpected(ex) && !ct.IsCancellationRequested)
         {
             return ex is InvalidDataException ? ex.Message : "The download failed. Try again later.";
